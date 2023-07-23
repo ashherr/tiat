@@ -1,0 +1,103 @@
+
+*{
+    font-family: 'Kosugi', sans-serif;
+}
+
+body {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 32px 0;
+}
+
+main {
+    position: relative;
+}
+
+.header-image {
+    transform: scaleX(-1);
+    width: 100%;
+}
+
+.event-image {
+    max-width: 600px;   
+}
+
+.header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+
+
+main {
+    width: 100%;
+    max-width: 600px;
+}
+
+h2 {
+    display: flex;
+    margin-block-start: 1.75em;
+}
+
+h2:after {
+    content: '';
+    flex: 1;
+    margin: auto .5em;
+    height: 0;
+
+}
+
+table {
+    width: 100%;
+}
+section {
+    position: relative;
+}
+
+td:last-child {
+    text-align: right;
+}
+
+
+/* Produces images on hover for each event heading */
+.image-container {
+  position: relative;
+  text-align: center;
+}
+
+.event-heading, &:visited {
+    color: inherit;
+    text-underline-offset: .3em;
+    cursor: cell;
+}
+
+.event-heading:hover {
+    color: blue;
+    text-decoration-color: blue;
+    transition: 160ms linear all;
+}
+
+.event-image {
+  position: absolute;
+  display: none;
+  left: 1em;
+  bottom: -10em;
+  width: auto;
+  height: auto;
+  
+}
+
+/* No horizontal overflow on mobile */
+@media (max-width: 600px) {
+    main {
+        padding: 0 16px;
+    }
+
+    .event-image {
+        bottom: 4rem;
+        left: 0;
+        right: 0;
+        margin: auto;
+        width: 100%;
+    }
+}
