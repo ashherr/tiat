@@ -21,6 +21,15 @@ const imageUrlsByHeading = {
     "https://pbs.twimg.com/media/F2UXqzjbYAAupKZ?format=jpg&name=4096x4096",
     "https://pbs.twimg.com/media/F2UXqzibkAAzBSu?format=jpg&name=4096x4096",
     "https://pbs.twimg.com/media/F2UXut6acAAezFa?format=jpg&name=4096x4096"
+  ],
+  "Demos from event 5": [
+    "https://pbs.twimg.com/media/GB0K2DpW8AAAfCU?format=jpg&name=4096x4096"
+  ],
+  "Demos from event 6": [
+    "https://pbs.twimg.com/media/GB0NkCpXUAA34Va?format=jpg&name=4096x4096",
+    "https://pbs.twimg.com/media/GB0M3zrXgAAIDI7?format=jpg&name=large",
+    "https://pbs.twimg.com/media/GB0Mwq-WUAAj441?format=jpg&name=4096x4096",
+    "https://pbs.twimg.com/media/GB0NTvpWYAEG1TX?format=jpg&name=4096x4096"
   ]
 };
 
