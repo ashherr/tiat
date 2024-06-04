@@ -26,6 +26,11 @@ const imageUrlsByHeading = {
   "Demos from event 6": [
     "https://i.postimg.cc/dQZ0RXPK/4e034a1e-f135-4161-b970-124cc462.jpg",
     "https://i.postimg.cc/mrqstLr1/IMG-0520.jpg"
+  ],
+  "Demos from event 7": [
+    "https://i.postimg.cc/8CPz38S7/tiat7-1.png",
+    "https://i.postimg.cc/PJw6jrDK/tiat7-2.png",
+    "https://i.postimg.cc/76C93YKD/tiat7-3.png"
   ]
 };
 
