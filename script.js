@@ -38,6 +38,12 @@ const imageUrlsByHeading = {
     "https://i.postimg.cc/R0H2NynB/tiat-ia-sharon-3.jpg",
     "https://i.postimg.cc/dVXzQw36/tiat-ia-dan-1.jpg"
   ],
+  "Demos from event 9": [
+    "https://i.postimg.cc/zfQxf0G6/IMG-1306.jpg",
+    "https://i.postimg.cc/1zDjM8wv/IMG-1331.jpg",
+    "https://i.postimg.cc/mrkdR0B7/IMG-1271.jpg",
+    "https://i.postimg.cc/52nPhxdx/IMG-1260.jpg",
+  ],
 };
 
 eventHeadings.forEach((eventHeading) => {
