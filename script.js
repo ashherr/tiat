@@ -41,7 +41,6 @@ const imageUrlsByHeading = {
   "Demos from event 9": [
     "https://i.postimg.cc/pL2GcmSG/IMG-1283.jpg",
     "https://i.postimg.cc/1zDjM8wv/IMG-1331.jpg",
-    "https://i.postimg.cc/mrkdR0B7/IMG-1271.jpg",
     "https://i.postimg.cc/52nPhxdx/IMG-1260.jpg"
   ],
 };
