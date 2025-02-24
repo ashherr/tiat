@@ -43,6 +43,12 @@ const imageUrlsByHeading = {
     "https://i.postimg.cc/1zDjM8wv/IMG-1331.jpg",
     "https://i.postimg.cc/52nPhxdx/IMG-1260.jpg"
   ],
+  "Demos from event 10": [
+    "https://i.postimg.cc/g0nBNdh0/IMG-8479-preview.jpg",
+    "https://i.postimg.cc/T3k4VhpS/IMG-3170.jpg",
+    "https://i.postimg.cc/ht4YQVPT/IMG-3217.jpg",
+    "https://i.postimg.cc/mZMJvb5z/IMG-8471-preview.jpg"
+  ],
 };
 
 eventHeadings.forEach((eventHeading) => {
