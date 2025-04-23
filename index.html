@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Intersection of Art & Technology</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>the intersection of art & technology</h1>
+    <h2>every bay area art + technology event happening soon</h2>
+    <a href="salons.html" class="salon-link">tiat salons</a>
+
+    <div class="tags">
+        <span class="filter-label">filter:</span>
+        <span class="tag tag-active" id="tag-all" onclick="filterByTag(null)">all</span>
+        <span class="tag" id="tag-generative" onclick="filterByTag('generative')">generative</span>
+        <span class="tag" id="tag-hardware" onclick="filterByTag('hardware')">hardware</span>
+        <span class="tag" id="tag-internet" onclick="filterByTag('internet')">internet</span>
+        <span class="tag" id="tag-projection" onclick="filterByTag('projection')">projection</span>
+        <span class="tag" id="tag-installation" onclick="filterByTag('installation')">installation</span>
+        <span class="tag" id="tag-xr" onclick="filterByTag('XR')">XR</span>
+        <span class="tag" id="tag-sound" onclick="filterByTag('sound')">sound</span>
+        <span class="tag" id="tag-ai-ml" onclick="filterByTag('AI / ML')">AI / ML</span>
+        <span class="tag" id="tag-speculative" onclick="filterByTag('speculative')">speculative</span>
+        <span class="tag" id="tag-data" onclick="filterByTag('data')">data</span>
+        <span class="tag" id="tag-fabrication" onclick="filterByTag('fabrication')">fabrication</span>
+    </div>
+    
+    <div class="submit-button">
+        <a href="submit.html">Submit New Event</a>
+    </div>
+
+    <div id="events"></div>
+    <div id="preview" class="preview"></div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
