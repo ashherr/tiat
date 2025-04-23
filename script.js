@@ -76,3 +76,105 @@ eventHeadings.forEach((eventHeading) => {
   // Set initial image
   eventImage.src = imageUrls[0];
 });
+
+// For GitHub Pages static version
+function loadEventsStatic() {
+    // Example static data - you would need to replace this with your actual event data
+    const staticEvents = [
+        {
+            id: 1,
+            title: "Example Art Event",
+            start_time: "2023-12-25T19:00:00",
+            location: "San Francisco Museum of Modern Art",
+            description: "An exciting exhibition of digital art and technology.",
+            image_url: "https://via.placeholder.com/400x300",
+            event_link: "https://example.com/event1",
+            tags: ["AI / ML", "generative"],
+            is_starred: true
+        },
+        {
+            id: 2,
+            title: "Tech Art Workshop",
+            start_time: "2023-12-26T14:00:00",
+            location: "Gray Area Foundation",
+            description: "Learn how to create interactive art with technology.",
+            image_url: "https://via.placeholder.com/400x300",
+            event_link: "https://example.com/event2",
+            tags: ["hardware", "installation"],
+            is_starred: false
+        }
+    ];
+    
+    return staticEvents;
+}
+
+// Modified function to work both with API and static data
+function loadEvents(tag = null) {
+    // Check if we're running on GitHub Pages (no backend)
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    
+    if (isGitHubPages) {
+        // Use static data for GitHub Pages
+        let events = loadEventsStatic();
+        
+        // Filter by tag if provided
+        if (tag) {
+            events = events.filter(event => event.tags.includes(tag));
+        }
+        
+        displayEvents(events);
+    } else {
+        // Use API for local development
+        let url = '/api/events';
+        if (tag) {
+            url += `?tag=${tag}`;
+        }
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(events => {
+                displayEvents(events);
+            });
+    }
+}
+
+function displayEvents(events) {
+    const eventsDiv = document.getElementById('events');
+    eventsDiv.innerHTML = '';
+    let currentDate = null;
+    
+    events.forEach(event => {
+        const date = new Date(event.start_time).toLocaleDateString();
+        if (date !== currentDate) {
+            currentDate = date;
+            const dateDiv = document.createElement('div');
+            dateDiv.className = 'date';
+            dateDiv.textContent = date;
+            eventsDiv.appendChild(dateDiv);
+        }
+        
+        const eventLink = document.createElement('a');
+        eventLink.className = 'event';
+        eventLink.href = event.event_link;
+        eventLink.target = "_blank";
+        eventLink.innerHTML = `
+            ${event.is_starred ? '<span class="star">★</span>' : ''}
+            ${new Date(event.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${event.title} - ${event.location}
+        `;
+        
+        eventLink.onmouseover = () => {
+            const preview = document.getElementById('preview');
+            preview.innerHTML = `
+                <img src="${event.image_url}" alt="${event.title}">
+                <p>${event.description}</p>
+            `;
+            preview.style.display = 'block';
+        };
+        
+        eventLink.onmouseout = () => {
+            document.getElementById('preview').style.display = 'none';
+        };
+        
+        eventsDiv.appendChild(eventLink);
+    });
+}
