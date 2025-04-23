@@ -1,0 +1,87 @@
+body {
+  font-family: 'Kosugi', sans-serif;
+  margin: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+h1 { 
+  font-size: 26px; 
+  margin-top: 30px;
+}
+
+h2 {
+  font-size: 18px;
+  margin-top: 30px;
+  position: relative;
+  z-index: 2;
+}
+
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+}
+
+table {
+  margin-top: 15px;
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+}
+
+table td {
+  padding: 5px 10px;
+  vertical-align: top;
+}
+
+table td:first-child {
+  width: 45%;
+}
+
+table td:last-child {
+  width: 55%;
+}
+
+section {
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.event-heading {
+  text-decoration: none;
+  color: black;
+  cursor: pointer;
+}
+
+a {
+  color: #000;
+}
+
+.image-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.event-image {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 70%;
+  max-height: 70vh;
+  opacity: 0.3;
+  z-index: -1;
+  display: none;
+  transition: opacity 0.3s ease;
+  border-radius: 4px;
+}
+
+.header {
+  margin-bottom: 20px;
+} 

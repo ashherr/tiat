@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Submit Event</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Kosugi', sans-serif; 
+            margin: 20px;
+            font-size: 14px;
+        }
+        h1 { font-size: 20px; }
+        form { max-width: 500px; }
+        label { display: block; margin-top: 10px; font-size: 13px; }
+        input, textarea { 
+            width: 100%; 
+            margin-top: 5px; 
+            font-family: 'Kosugi', sans-serif;
+            font-size: 13px;
+        }
+        button { font-size: 13px; font-family: 'Kosugi', sans-serif; }
+        .tags { margin-top: 10px; }
+        .tag-item { display: inline-block; margin-right: 15px; font-size: 12px; }
+        a { font-size: 13px; }
+        .required { color: red; font-size: 10px; margin-left: 3px; }
+    </style>
+</head>
+<body>
+    <h1>Submit Event</h1>
+    <form method="POST" onsubmit="return validateForm()">
+        <label>Event Name:
+            <input type="text" name="title" required>
+        </label>
+        
+        <label>Event Time:
+            <input type="datetime-local" name="start_time" required>
+        </label>
+        
+        <label>Location:
+            <input type="text" name="location" required>
+        </label>
+        
+        <label>Description:
+            <textarea name="description" rows="4" required></textarea>
+        </label>
+        
+        <label>Image URL:
+            <input type="url" name="image_url" required>
+        </label>
+        
+        <label>Event Link:
+            <input type="url" name="event_link" required>
+        </label>
+        
+        <div class="tags">
+            <label>Tags: <span class="required">(at least one required)</span></label>
+            <div>
+                {% for tag in ['generative', 'hardware', 'internet', 'projection', 'installation', 'XR', 'sound', 'AI / ML', 'speculative', 'data', 'fabrication'] %}
+                    <div class="tag-item">
+                        <input type="checkbox" name="tags" value="{{ tag }}" id="tag-{{ tag }}">
+                        <label for="tag-{{ tag }}">{{ tag }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <p><button type="submit">Submit Event</button></p>
+    </form>
+    <p><a href="{{ url_for('index') }}">Back to Events</a></p>
+
+    <script>
+        function validateForm() {
+            const checkboxes = document.querySelectorAll('input[name="tags"]');
+            let checked = false;
+            
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    checked = true;
+                }
+            });
+            
+            if (!checked) {
+                alert("Please select at least one tag.");
+                return false;
+            }
+            
+            return true;
+        }
+    </script>
+</body>
+</html> 
