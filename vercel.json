@@ -16,8 +16,12 @@
         "dest": "/api/recovery.py"
       },
       {
+        "src": "/api/events",
+        "dest": "/api/events.py"
+      },
+      {
         "src": "/(.*)",
-        "dest": "/api/simple.py"
+        "dest": "/api/pages.py"
       }
     ],
     "env": {
