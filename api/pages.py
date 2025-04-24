@@ -131,6 +131,58 @@ class handler(BaseHTTPRequestHandler):
                     margin-top: 40px;
                 }}
             </style>
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Kosugi&display=swap" rel="stylesheet">
+            
+            <!-- Google tag (gtag.js) -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id=G-MCCV52KT3X"></script>
+            <script>
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){{dataLayer.push(arguments);}}
+              gtag('js', new Date());
+            
+              gtag('config', 'G-MCCV52KT3X');
+            </script>
+            
+            <!-- Interactive features for salon listings -->
+            <script>
+              document.addEventListener("DOMContentLoaded", function() {{
+                // Add event listeners for salon headings
+                const eventHeadings = document.querySelectorAll('.event-heading');
+                
+                eventHeadings.forEach(heading => {{
+                  heading.addEventListener('click', function() {{
+                    const headingText = this.getAttribute('data-heading');
+                    console.log(`Clicked on: ${{headingText}}`);
+                    
+                    // Find and toggle the table following this heading
+                    const section = this.closest('section');
+                    const table = section.querySelector('table');
+                    if (table) {{
+                      table.style.display = table.style.display === 'none' ? 'table' : 'none';
+                    }}
+                  }});
+                }});
+                
+                // Smooth scrolling for anchor links
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {{
+                  anchor.addEventListener('click', function (e) {{
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {{
+                      targetElement.scrollIntoView({{
+                        behavior: 'smooth'
+                      }});
+                    }}
+                  }});
+                }});
+              }});
+            </script>
         </head>
         """
     
@@ -173,68 +225,8 @@ class handler(BaseHTTPRequestHandler):
             <meta http-equiv="X-UA-Compatible" content="IE=edge" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <title>the intersection of art & technology</title>
-            <style>
-                body {{
-                    font-family: 'Kosugi', sans-serif;
-                    margin: 20px;
-                    font-size: 14px;
-                    line-height: 1.5;
-                }}
-                h1 {{ 
-                    font-size: 26px; 
-                    margin-top: 30px;
-                }}
-                h2 {{
-                    font-size: 18px;
-                    margin-top: 30px;
-                }}
-                main {{
-                    max-width: 800px;
-                    margin: 0 auto;
-                }}
-                table {{
-                    margin-top: 15px;
-                    border-collapse: collapse;
-                    width: 100%;
-                }}
-                table td {{
-                    padding: 5px 10px;
-                    vertical-align: top;
-                }}
-                section {{
-                    margin-bottom: 40px;
-                }}
-                .event-heading {{
-                    text-decoration: none;
-                    color: black;
-                }}
-                a {{
-                    color: #000;
-                }}
-                
-                /* Recovery notice */
-                .recovery-notice {{
-                    background-color: #d4edda;
-                    color: #155724;
-                    padding: 15px;
-                    margin: 20px 0;
-                    border-radius: 4px;
-                    text-align: center;
-                }}
-                
-                /* Navigation */
-                .nav {{
-                    display: flex;
-                    margin: 20px 0;
-                }}
-                .nav a {{
-                    margin-right: 15px;
-                    text-decoration: none;
-                    padding: 5px 10px;
-                    background: #f1f1f1;
-                    border-radius: 3px;
-                }}
-            </style>
+            <link rel="stylesheet" href="/static/style.css">
+            
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
             <link href="https://fonts.googleapis.com/css2?family=Kosugi&display=swap" rel="stylesheet">
@@ -245,9 +237,12 @@ class handler(BaseHTTPRequestHandler):
               window.dataLayer = window.dataLayer || [];
               function gtag(){{dataLayer.push(arguments);}}
               gtag('js', new Date());
-            
               gtag('config', 'G-MCCV52KT3X');
             </script>
+            
+            <!-- Interactive features -->
+            <script src="/static/main.js"></script>
+            <script src="/static/images.js"></script>
         </head>
 
         <body>
@@ -280,7 +275,7 @@ class handler(BaseHTTPRequestHandler):
                     >
                       <h2> tiat 11</h2>
                       <div class="image-container">
-                        
+                        <img src="" alt="Images from event 11" class="event-image" />
                       </div>
                     </a>
 
@@ -473,6 +468,358 @@ class handler(BaseHTTPRequestHandler):
                     </table>
                 </section>
 
+                <section>
+                    <a
+                      href="javascript:void(0)"
+                      class="event-heading"
+                      data-heading="Demos from event 7"
+                    >
+                      <h2>tiat 7</h2>
+                      <div class="image-container">
+                        <img src="" alt="Images from event 7" class="event-image" />
+                      </div>
+                    </a>
+
+                    <table>
+                      <colgroup>
+                        <col style="width: 45%;">
+                        <col style="width: 55%;">
+                      </colgroup>
+                      <tr>
+                        <td>vent</td>
+                        <td>ash herr</td>
+                      </tr>
+                      <tr>
+                        <td>ratio</td>
+                        <td>​johan ismael / david grunzweig</td>
+                      </tr>
+                      <tr>
+                        <td>fred again app</td>
+                        <td>claire wang</td>
+                      </tr>
+                      <tr>
+                        <td>everything interface</td>
+                        <td>alessio grancini</td>
+                      </tr>
+                      <tr>
+                        <td>qigong, magic wave</td>
+                        <td>koi ren</td>
+                      </tr>
+                      <tr>
+                        <td>hotvinebhotline</td>
+                        <td>taylor tabb</td>
+                      </tr>
+                    </table>
+                </section>
+
+                <section>
+                    <a
+                      href="javascript:void(0)"
+                      class="event-heading"
+                      data-heading="Demos from event 6"
+                    >
+                      <h2>tiat 6</h2>
+                      <div class="image-container">
+                        <img src="" alt="Images from event 6" class="event-image" />
+                      </div>
+                    </a>
+
+                    <table>
+                      <colgroup>
+                        <col style="width: 45%;">
+                        <col style="width: 55%;">
+                      </colgroup>
+                      <tr>
+                        <td>diffusion grown card decks</td>
+                        <td>marisa lu</td>
+                      </tr>
+                      <tr>
+                        <td>garden of ancients</td>
+                        <td>jeffrey yip</td>
+                      </tr>
+                      <tr>
+                        <td>breathe together</td>
+                        <td>megan van weilie</td>
+                      </tr>
+                      <tr>
+                        <td>data sensing toolkit</td>
+                        <td>scott kildall</td>
+                      </tr>
+                      <tr>
+                        <td>GPT-me</td>
+                        <td>avital meshi</td>
+                      </tr>
+                      <tr>
+                        <td>dataset butoh</td>
+                        <td>noah aust</td>
+                      </tr>
+                      <tr>
+                        <td>fluid sculpture</td>
+                        <td>danny so-haeg</td>
+                      </tr>
+                      <tr>
+                        <td>synesthetic perceptions</td>
+                        <td>amanda yeh</td>
+                      </tr>
+                      <tr>
+                        <td>last seen online</td>
+                        <td>henry tran</td>
+                      </tr>
+                      <tr>
+                        <td>body output digital interface</td>
+                        <td>taylor tabb</td>
+                      </tr>
+                      <tr>
+                        <td>cyber taoism dream - zhuangzi's butterfly inception</td>
+                        <td>lin xinye</td>
+                      </tr>
+                      <tr>
+                        <td>call this # now</td>
+                        <td>cole ryder</td>
+                      </tr>
+                    </table>
+                </section>
+
+                <section>
+                    <a
+                      href="javascript:void(0)"
+                      class="event-heading"
+                      data-heading="Demos from event 5"
+                    >
+                      <h2>tiat 5</h2>
+                      <div class="image-container">
+                        <img src="" alt="Images from event 5" class="event-image" />
+                      </div>
+                    </a>
+
+                    <table>
+                      <tr>
+                        <td>you're never lonely on wikipedia</td>
+                        <td>ash herr</td>
+                      </tr>
+                      <tr>
+                        <td>improv</td>
+                        <td>joe baker</td>
+                      </tr>
+                      <tr>
+                        <td>flow fields</td>
+                        <td>rishi pandey</td>
+                      </tr>
+                      <tr>
+                        <td>dis//continuity</td>
+                        <td>joey verbeke</td>
+                      </tr>
+                      <tr>
+                        <td>reVerb</td>
+                        <td>sara</td>
+                      </tr>
+                      <tr>
+                        <td>shapes at play</td>
+                        <td>bonnie pham</td>
+                      </tr>
+                      <tr>
+                        <td>elevator pitch</td>
+                        <td>marc</td>
+                      </tr>
+                      <tr>
+                        <td>ai drawing experiments</td>
+                        <td>james hurlburt</td>
+                      </tr>
+                      <tr>
+                        <td>visual synth experiments</td>
+                        <td>koven kawandeep</td>
+                      </tr>
+                      <tr>
+                        <td>the healing room</td>
+                        <td>mingzhu heseri</td>
+                      </tr>
+                      <tr>
+                        <td>church of GPT</td>
+                        <td>zain shah</td>
+                      </tr>
+                      <tr>
+                        <td>mid conversation</td>
+                        <td>leia chang</td>
+                      </tr>
+                    </table>
+                </section>
+
+                <section>
+                    <a
+                      href="javascript:void(0)"
+                      class="event-heading"
+                      data-heading="Demos from event 4"
+                    >
+                      <h2>tiat 4</h2>
+                      <div class="image-container">
+                        <img src="" alt="Images from event 4" class="event-image" />
+                      </div>
+                    </a>
+
+                    <table>
+                      <tr>
+                        <td>resonant frequency</td>
+                        <td>joe baker</td>
+                      </tr>
+                      <tr>
+                        <td>spider trap</td>
+                        <td>sri</td>
+                      </tr>
+                      <tr>
+                        <td>overruled</td>
+                        <td>cody</td>
+                      </tr>
+                      <tr>
+                        <td>dawn</td>
+                        <td>ritwik</td>
+                      </tr>
+                      <tr>
+                        <td>lumi</td>
+                        <td>vignesh rajmohan</td>
+                      </tr>
+                      <tr>
+                        <td>candle !holder</td>
+                        <td>leia chang</td>
+                      </tr>
+                      <tr>
+                        <td>memory, love, and the handmade</td>
+                        <td>alexa ann bonomo</td>
+                      </tr>
+                      <tr>
+                        <td>bespoke</td>
+                        <td>evan dorsky</td>
+                      </tr>
+                      <tr>
+                        <td>sound werkshop</td>
+                        <td>chris guichet</td>
+                      </tr>
+                    </table>
+                </section>
+
+                <section>
+                    <a
+                      href="javascript:void(0)"
+                      class="event-heading"
+                      data-heading="Demos from event 3"
+                    >
+                      <h2>tiat 3</h2>
+                      <div class="image-container">
+                        <img src="" alt="Images from event 3" class="event-image" />
+                      </div>
+                    </a>
+
+                    <table>
+                      <tr>
+                        <td>simulated validation</td>
+                        <td>henry tran</td>
+                      </tr>
+                      <tr>
+                        <td>bitcube</td>
+                        <td>justine sun dela cruz</td>
+                      </tr>
+                      <tr>
+                        <td>musai</td>
+                        <td>jake mclain</td>
+                      </tr>
+                      <tr>
+                        <td>letters from a stranger</td>
+                        <td>mylene tu</td>
+                      </tr>
+                      <tr>
+                        <td>light + code experiments</td>
+                        <td>dan gorelick</td>
+                      </tr>
+                      <tr>
+                        <td>light it up</td>
+                        <td>marisa lu</td>
+                      </tr>
+                    </table>
+                </section>
+
+                <section>
+                    <a
+                      href="javascript:void(0)"
+                      class="event-heading"
+                      data-heading="Demos from event 2"
+                    >
+                      <h2>tiat 2</h2>
+                      <div class="image-container">
+                        <img src="" alt="Images from event 2" class="event-image" />
+                      </div>
+                    </a>
+
+                    <table>
+                      <tr>
+                        <td>dataviz</td>
+                        <td>ara</td>
+                      </tr>
+                      <tr>
+                        <td>huddler</td>
+                        <td>jordan</td>
+                      </tr>
+                      <tr>
+                        <td>break</td>
+                        <td>eric lum</td>
+                      </tr>
+                      <tr>
+                        <td>impulse</td>
+                        <td>daniel</td>
+                      </tr>
+                      <tr>
+                        <td>wide views</td>
+                        <td>gray crawford</td>
+                      </tr>
+                      <tr>
+                        <td>acrylic</td>
+                        <td>celeste</td>
+                      </tr>
+                      <tr>
+                        <td>projects</td>
+                        <td>mitch chaiet</td>
+                      </tr>
+                    </table>
+                </section>
+
+                <section>
+                    <a
+                      href="javascript:void(0)"
+                      class="event-heading"
+                      data-heading="Demos from event 1"
+                    >
+                      <h2>tiat 1</h2>
+                      <div class="image-container">
+                        <img src="" alt="Images from event 1" class="event-image" />
+                      </div>
+                    </a>
+
+                    <table>
+                      <tr>
+                        <td>coffee sada</td>
+                        <td>ali</td>
+                      </tr>
+                      <tr>
+                        <td>dating gpt</td>
+                        <td>henry tran</td>
+                      </tr>
+                      <tr>
+                        <td>streamwork</td>
+                        <td>jared hsu</td>
+                      </tr>
+                      <tr>
+                        <td>dial gpt</td>
+                        <td>george</td>
+                      </tr>
+                      <tr>
+                        <td>mit: regressions</td>
+                        <td>luke igel</td>
+                      </tr>
+                      <tr>
+                        <td>latent expressionism</td>
+                        <td>nicholas bardy</td>
+                      </tr>
+                    </table>
+                </section>
+
                 <footer>
                     <br><br><br><br>
                     <p>
@@ -481,6 +828,22 @@ class handler(BaseHTTPRequestHandler):
                     </p>
                 </footer>
             </main>
+            <div id="cursor-chat-layer">
+              <input type="text" id="cursor-chat-box" />
+            </div>
+            <!-- install playhtml -->
+            <script type="module" src="https://unpkg.com/playhtml"></script>
+            <link rel="stylesheet" href="https://unpkg.com/playhtml/dist/style.css" />
+            <!-- install cursor chat -->
+            <script type="module">
+              import { initCursorChat } from "https://esm.sh/cursor-chat";
+              initCursorChat(window.location.href);
+            </script>
+            <link
+              rel="stylesheet"
+              type="text/css"
+              href="https://unpkg.com/cursor-chat/dist/style.css"
+            />
         </body>
         </html>
         """
