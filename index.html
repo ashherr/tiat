@@ -5,7 +5,88 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kosugi&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body { 
+            font-family: 'Kosugi', sans-serif; 
+            margin: 20px;
+            font-size: 14px; 
+        }
+        h1 { 
+            font-size: 26px; 
+            margin-top: 30px;
+        }
+        h2 {
+            font-size: 14px;
+            font-weight: normal;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        .salon-link {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .submit-button {
+            margin-top: 20px;
+            margin-bottom: 30px;
+            font-size: 12px;
+        }
+        .event { 
+            margin-left: 20px; 
+            cursor: pointer; 
+            font-size: 13px;
+            text-decoration: none;
+            color: black;
+            display: block;
+            padding: 2px 0;
+        }
+        .event:hover {
+            background-color: #f5f5f5;
+        }
+        .date { 
+            font-weight: bold; 
+            font-size: 14px; 
+            margin-top: 20px;
+            margin-bottom: 5px;
+        }
+        /* Add extra space before the first date */
+        .date:first-of-type {
+            margin-top: 10px;
+        }
+        .preview { 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            display: none; 
+            text-align: center;
+            font-size: 12px; 
+            background-color: white;
+            padding: 10px;
+            border: 1px solid #ccc;
+            z-index: 100;
+        }
+        .preview img { max-width: 500px; max-height: 400px; }
+        .tags { 
+            margin-bottom: 20px; 
+            display: flex; 
+            align-items: center; 
+            padding-bottom: 20px;
+        }
+        .filter-label { margin-right: 10px; font-size: 12px; }
+        .tag { 
+            cursor: pointer; 
+            margin-right: 10px; 
+            text-decoration: underline; 
+            font-size: 12px; 
+            padding: 2px 5px;
+        }
+        .tag-active {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        .star { color: gold; }
+    </style>
 </head>
 <body>
     <h1>the intersection of art & technology</h1>
