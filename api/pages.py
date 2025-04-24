@@ -164,45 +164,323 @@ class handler(BaseHTTPRequestHandler):
         """
     
     def get_home_page(self):
-        """Generate the home page with salons"""
+        """Generate the home page with salons based on the original salons.html"""
         return f"""
         <!DOCTYPE html>
-        <html>
-        {self.get_common_head("Salons")}
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8" />
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title>the intersection of art & technology</title>
+            <style>
+                body {{
+                    font-family: 'Kosugi', sans-serif;
+                    margin: 20px;
+                    font-size: 14px;
+                    line-height: 1.5;
+                }}
+                h1 {{ 
+                    font-size: 26px; 
+                    margin-top: 30px;
+                }}
+                h2 {{
+                    font-size: 18px;
+                    margin-top: 30px;
+                }}
+                main {{
+                    max-width: 800px;
+                    margin: 0 auto;
+                }}
+                table {{
+                    margin-top: 15px;
+                    border-collapse: collapse;
+                    width: 100%;
+                }}
+                table td {{
+                    padding: 5px 10px;
+                    vertical-align: top;
+                }}
+                section {{
+                    margin-bottom: 40px;
+                }}
+                .event-heading {{
+                    text-decoration: none;
+                    color: black;
+                }}
+                a {{
+                    color: #000;
+                }}
+                
+                /* Recovery notice */
+                .recovery-notice {{
+                    background-color: #d4edda;
+                    color: #155724;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 4px;
+                    text-align: center;
+                }}
+                
+                /* Navigation */
+                .nav {{
+                    display: flex;
+                    margin: 20px 0;
+                }}
+                .nav a {{
+                    margin-right: 15px;
+                    text-decoration: none;
+                    padding: 5px 10px;
+                    background: #f1f1f1;
+                    border-radius: 3px;
+                }}
+            </style>
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Kosugi&display=swap" rel="stylesheet">
+            
+            <!-- Google tag (gtag.js) -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id=G-MCCV52KT3X"></script>
+            <script>
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){{dataLayer.push(arguments);}}
+              gtag('js', new Date());
+            
+              gtag('config', 'G-MCCV52KT3X');
+            </script>
+        </head>
+
         <body>
-            {self.get_header()}
-            
-            <div class="container">
-                <h2>Upcoming Salons</h2>
-                <p>Technology in Art Salons (TIAT) are hosted gatherings where artists, technologists, and creators come together to share ideas, collaborate, and explore the intersection of technology and art.</p>
+            <main>
+                <div class="header"></div>
+                <br> <br>
                 
-                <div class="salon">
-                    <h3>AI in Visual Arts</h3>
-                    <p><strong>Date:</strong> November 15, 2023</p>
-                    <p><strong>Location:</strong> San Francisco - Gallery 16</p>
-                    <p>Join us for a discussion on how artificial intelligence is transforming visual arts. Artists will share their experiences working with AI tools like DALL-E, Midjourney, and Stable Diffusion.</p>
+                <h1>tiat salons</h1>
+                
+                <div class="recovery-notice">
+                    <strong>Recovery Mode:</strong> The site is being rebuilt with a new structure. Salons are now on the home page.
                 </div>
                 
-                <div class="salon">
-                    <h3>Interactive Installations Workshop</h3>
-                    <p><strong>Date:</strong> December 3, 2023</p>
-                    <p><strong>Location:</strong> Berkeley - The Annex</p>
-                    <p>A hands-on workshop exploring the creation of interactive art installations using sensors, microcontrollers, and projection mapping techniques.</p>
+                <div class="nav">
+                    <a href="/">Salons</a>
+                    <a href="/events">Events</a>
+                    <a href="/submit">Submit</a>
+                    <a href="/recovery">Status</a>
                 </div>
                 
-                <div class="salon">
-                    <h3>NFTs and Digital Ownership</h3>
-                    <p><strong>Date:</strong> December 18, 2023</p>
-                    <p><strong>Location:</strong> Oakland - Tech Hub</p>
-                    <p>A panel discussion on the current state of NFTs and digital ownership in the art world. What's working, what's not, and where do we go from here?</p>
-                </div>
+                <p>
+                    art demos for the creative technologists in sf. 
+                </p>
                 
-                <div class="notice warning">
-                    <p>Want to host a salon? <a href="/submit">Submit your proposal here</a>.</p>
-                </div>
-            </div>
-            
-            {self.get_footer()}
+                <section>
+                    <a
+                      href="javascript:void(0)"
+                      class="event-heading"
+                      data-heading="Demos from event 11"
+                    >
+                      <h2> tiat 11</h2>
+                      <div class="image-container">
+                        
+                      </div>
+                    </a>
+
+                    <p>the next tiat is on May 4th, 2025 at 7pm. <a href="https://lu.ma/w2xi3u4p">RSVP here</a></p>
+                </section>
+
+                <section>
+                    <a
+                      href="javascript:void(0)"
+                      class="event-heading"
+                      data-heading="Demos from event 10"
+                    >
+                      <h2> tiat 10</h2>
+                      <div class="image-container">
+                        <img src="" alt="Images from event 10" class="event-image" />
+                      </div>
+                    </a>
+
+                    <p><a href="https://www.youtube.com/watch?v=brfgTr0PJvg">watch the recording</a></p>
+
+                    <table>
+                      <colgroup>
+                        <col style="width: 45%;">
+                        <col style="width: 55%;">
+                      </colgroup>
+                      <tr>
+                        <td>latent fields</td>
+                        <td>​rishi pandey</td>
+                      </tr>
+                      <tr>
+                        <td>music explorer / little guy</td>
+                        <td>daniel kuntz</td>
+                      </tr>
+                      <tr>
+                        <td>rat dating simulator</td>
+                        <td>connie ye</td>
+                      </tr>
+                      <tr>
+                        <td>a poem</td>
+                        <td>alicia guo</td>
+                      </tr>
+                      <tr>
+                        <td>roombavision</td>
+                        <td>taylor tabb & adnan aga</td>
+                      </tr>
+                      <tr>
+                        <td>square powder claw</td>
+                        <td>halim madi</td>
+                      </tr>
+                      <tr>
+                        <td>vocoder</td>
+                        <td>julip</td>
+                      </tr>
+                      <tr>
+                        <td>latent space image variation</td>
+                        <td>gray crawford</td>
+                      </tr>
+                      <tr>
+                        <td>kiko</td>
+                        <td>kyt</td>
+                      </tr>
+                      <tr></tr>
+                        <td>lasers are the message</td>
+                        <td>brendan luu</td>
+                      </tr>
+                    </table>
+                </section>
+
+                <section>
+                    <a
+                      href="javascript:void(0)"
+                      class="event-heading"
+                      data-heading="Demos from event 9"
+                    >
+                      <h2> tiat 9</h2>
+                      <div class="image-container">
+                        <img src="" alt="Images from event 9" class="event-image" />
+                      </div>
+                    </a>
+
+                    <p><a href="https://www.youtube.com/watch?v=Y0HBiyo3W48">watch the recording</a></p>
+
+                    <table>
+                      <colgroup>
+                        <col style="width: 45%;">
+                        <col style="width: 55%;">
+                      </colgroup>
+                      <tr>
+                        <td>body language</td>
+                        <td>ash herr</td>
+                      </tr>
+                      <tr>
+                        <td>AcknowledgeNET</td>
+                        <td>spencer chang</td>
+                      </tr>
+                      <tr>
+                        <td>knit soundscape/memory</td>
+                        <td>jessica kim</td>
+                      </tr>
+                      <tr>
+                        <td>bop spotter</td>
+                        <td>riley walz</td>
+                      </tr>
+                      <tr>
+                        <td>ratatouille irl</td>
+                        <td>athena leong</td>
+                      </tr>
+                      <tr>
+                        <td>strange loops</td>
+                        <td>ninon hollanderski </td>
+                      </tr>
+                      <tr>
+                        <td>advice line proj</td>
+                        <td>danielle egan</td>
+                      </tr>
+                      <tr>
+                        <td>duump site</td>
+                        <td>ven qiu</td>
+                      </tr>
+                      <tr>
+                        <td>daily sketching</td>
+                        <td>zach lieberman</td>
+                      </tr>
+                      <tr></tr>
+                        <td>himala (miracle)</td>
+                        <td>chia amisola</td>
+                      </tr>
+                    </table>
+                </section>
+                
+                <section>
+                    <a
+                      href="javascript:void(0)"
+                      class="event-heading"
+                      data-heading="Demos from event 8"
+                    >
+                      <h2> tiat 8</h2>
+                      <div class="image-container">
+                        <img src="" alt="Images from event 8" class="event-image" />
+                      </div>
+                    </a>
+
+                    <p><a href="https://www.youtube.com/watch?v=dBErFlHfc8w">watch the recording</a></p>
+
+                    <table>
+                      <colgroup>
+                        <col style="width: 45%;">
+                        <col style="width: 55%;">
+                      </colgroup>
+                      <tr>
+                        <td>anti-aging software</td>
+                        <td>ash herr</td>
+                      </tr>
+                      <tr>
+                        <td>music millennium</td>
+                        <td>melisa seah</td>
+                      </tr>
+                      <tr>
+                        <td>UR-AURA</td>
+                        <td>sharon zheng</td>
+                      </tr>
+                      <tr>
+                        <td>we called us poetry</td>
+                        <td>halim madi</td>
+                      </tr>
+                      <tr>
+                        <td>chinese cyberfeminism archive</td>
+                        <td>crassula shang</td>
+                      </tr>
+                      <tr>
+                        <td>biotopy</td>
+                        <td>​​darren zhu</td>
+                      </tr>
+                      <tr>
+                        <td>random drums</td>
+                        <td>​jeanette andrews</td>
+                      </tr>
+                      <tr>
+                        <td>1-bit halftone thermal printing</td>
+                        <td>evan sirchuk</td>
+                      </tr>
+                      <tr>
+                        <td>binaural tuner</td>
+                        <td>dan gorelick</td>
+                      </tr>
+                      <tr>
+                        <td>and you'll miss it</td>
+                        <td>henry tran</td>
+                      </tr>
+                    </table>
+                </section>
+
+                <footer>
+                    <br><br><br><br>
+                    <p>
+                      questions? reach out to
+                      <a href="https://imempowa.com/">ash</a>
+                    </p>
+                </footer>
+            </main>
         </body>
         </html>
         """
