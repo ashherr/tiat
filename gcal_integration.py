@@ -5,7 +5,6 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from dotenv import load_dotenv
-import traceback
 
 # Load environment variables
 load_dotenv()
@@ -17,67 +16,22 @@ CALENDAR_ID = os.getenv('GOOGLE_CALENDAR_ID', 'primary')  # Calendar ID to add e
 def create_service():
     """Create a Google Calendar API service."""
     try:
-        # Check for service account key in environment variables first
-        service_account_email = os.getenv('GOOGLE_SERVICE_ACCOUNT_EMAIL')
-        service_account_private_key = os.getenv('GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY')
+        # Check if credentials file exists
+        if not os.path.exists(CREDENTIALS_FILE):
+            print(f"Credentials file not found: {CREDENTIALS_FILE}")
+            return None
+            
+        # Create credentials using service account
+        credentials = service_account.Credentials.from_service_account_file(
+            CREDENTIALS_FILE, 
+            scopes=['https://www.googleapis.com/auth/calendar']
+        )
         
-        if service_account_email and service_account_private_key:
-            print("Using Google service account from environment variables")
-            
-            # Replace newline placeholders with actual newlines if needed
-            if "\\n" in service_account_private_key:
-                service_account_private_key = service_account_private_key.replace("\\n", "\n")
-            
-            # Create service account info dictionary
-            credentials_info = {
-                "type": "service_account",
-                "project_id": os.getenv('GOOGLE_PROJECT_ID', ''),
-                "private_key_id": os.getenv('GOOGLE_PRIVATE_KEY_ID', ''),
-                "private_key": service_account_private_key,
-                "client_email": service_account_email,
-                "client_id": os.getenv('GOOGLE_CLIENT_ID', ''),
-                "auth_uri": os.getenv('GOOGLE_AUTH_URI', 'https://accounts.google.com/o/oauth2/auth'),
-                "token_uri": os.getenv('GOOGLE_TOKEN_URI', 'https://oauth2.googleapis.com/token'),
-                "auth_provider_x509_cert_url": os.getenv('GOOGLE_AUTH_PROVIDER_X509_CERT_URL', 'https://www.googleapis.com/oauth2/v1/certs'),
-                "client_x509_cert_url": os.getenv('GOOGLE_CLIENT_X509_CERT_URL', '')
-            }
-            
-            # Create credentials from dictionary
-            try:
-                credentials = service_account.Credentials.from_service_account_info(
-                    credentials_info,
-                    scopes=['https://www.googleapis.com/auth/calendar']
-                )
-            except Exception as e:
-                print(f"Error creating credentials from environment variables: {e}")
-                print("Falling back to credentials file...")
-                credentials = None
-                
-            if credentials:
-                service = build('calendar', 'v3', credentials=credentials)
-                return service
-                
-        # Fall back to file-based credentials if environment variables didn't work
-        if os.path.exists(CREDENTIALS_FILE):
-            print(f"Using Google credentials from file: {CREDENTIALS_FILE}")
-            try:
-                credentials = service_account.Credentials.from_service_account_file(
-                    CREDENTIALS_FILE, 
-                    scopes=['https://www.googleapis.com/auth/calendar']
-                )
-                service = build('calendar', 'v3', credentials=credentials)
-                return service
-            except Exception as e:
-                print(f"Error creating credentials from file: {e}")
-                return None
-        
-        # No valid credentials available
-        print("No valid Google credentials available. Calendar features will be disabled.")
-        return None
-            
+        # Build the service
+        service = build('calendar', 'v3', credentials=credentials)
+        return service
     except Exception as e:
         print(f"Error creating Google Calendar service: {e}")
-        print(f"Error details: {traceback.format_exc()}")
         return None
 
 def add_event_to_calendar(event_data):

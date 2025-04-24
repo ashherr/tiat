@@ -6,7 +6,6 @@ import os
 import traceback
 import requests
 import json
-import sys
 from dotenv import load_dotenv
 # Import Google Calendar integration
 import gcal_integration
@@ -25,13 +24,6 @@ is_production = os.environ.get('VERCEL', False)
 supabase_url = os.getenv('SUPABASE_URL', '')
 supabase_key = os.getenv('SUPABASE_KEY', '')
 project_id = supabase_url.replace('https://', '').split('.')[0] if supabase_url else ''
-
-# Print environment info for debugging
-print(f"Python version: {sys.version}")
-print(f"Environment variables: {list(os.environ.keys())}")
-print(f"ENABLE_GCAL set to: {os.getenv('ENABLE_GCAL')}")
-print(f"GOOGLE_CALENDAR_ID set to: {os.getenv('GOOGLE_CALENDAR_ID', 'Not set')}")
-print(f"GOOGLE_SERVICE_ACCOUNT_EMAIL present: {'Yes' if os.getenv('GOOGLE_SERVICE_ACCOUNT_EMAIL') else 'No'}")
 
 # Set the database URI based on environment
 if is_production:
@@ -144,21 +136,13 @@ def salon():
 
 @app.route('/calendar')
 def calendar():
-    """Show calendar subscription information."""
-    try:
-        calendar_info = gcal_integration.get_calendar_info()
-        
-        return render_template('calendar.html',
-                            calendar_id=calendar_info['calendar_id'],
-                            google_url=calendar_info['html_link'],
-                            ical_url=calendar_info['ical_url'],
-                            embed_html=calendar_info['embed_html'])
-    except Exception as e:
-        print(f"Error loading calendar info: {str(e)}")
-        # Return an error page instead of crashing
-        return render_template('error.html', 
-                              error="Calendar integration is currently unavailable", 
-                              description="Please try again later or contact the administrator.")
+    calendar_info = gcal_integration.get_calendar_info()
+    
+    return render_template('calendar.html',
+                          calendar_id=calendar_info['calendar_id'],
+                          google_url=calendar_info['html_link'],
+                          ical_url=calendar_info['ical_url'],
+                          embed_html=calendar_info['embed_html'])
 
 @app.route('/submit', methods=['GET', 'POST'])
 def submit_event():
@@ -199,9 +183,9 @@ def submit_event():
                         print(f"Event added to Google Calendar with ID: {calendar_event_id}")
                     else:
                         print("Failed to add event to Google Calendar")
-                except Exception as cal_error:
-                    print(f"Error adding to Google Calendar: {str(cal_error)}")
-                    # Continue with submission even if calendar fails
+                except Exception as gcal_error:
+                    print(f"Google Calendar error: {str(gcal_error)}")
+                    # Continue with database insertion even if calendar fails
             
             if is_production:
                 # Use Supabase REST API in production
@@ -379,33 +363,6 @@ def api_test():
             }
         }), 500
 
-# Add a global error handler
-@app.errorhandler(500)
-def server_error(e):
-    error_traceback = traceback.format_exc()
-    print(f"500 error: {str(e)}\n{error_traceback}")
-    return render_template('error.html', 
-                          error="Internal Server Error", 
-                          description="The server encountered an internal error. Please try accessing /debug for more information."), 500
-
-@app.errorhandler(404)
-def not_found(e):
-    return render_template('error.html', 
-                          error="Page Not Found", 
-                          description="The requested page does not exist."), 404
-
-# Fallback index route for when other routes fail
-@app.route('/minimal-index')
-def minimal_index():
-    """Minimal index page that doesn't rely on database or external services"""
-    return """
-    <html><body>
-    <h1>TIAT Minimal Mode</h1>
-    <p>The site is running in minimal mode due to configuration issues.</p>
-    <p><a href="/debug">View debug information</a></p>
-    </body></html>
-    """
-
 # Redirect for static files
 @app.route('/salons.html')
 def salons_static():
@@ -414,62 +371,6 @@ def salons_static():
 @app.route('/submit.html')
 def submit_static():
     return redirect(url_for('submit_event'))
-
-# Add a debug route for Vercel troubleshooting
-@app.route('/debug')
-def debug():
-    """Route to help debug Vercel deployment issues"""
-    env_vars = {k: (v if not k.lower().startswith('google_service_account_private') else '[REDACTED]') 
-               for k, v in os.environ.items()}
-    
-    # Test Google Calendar credentials separately
-    gcal_test = None
-    gcal_error = None
-    try:
-        if os.getenv('ENABLE_GCAL', 'false').lower() == 'true':
-            service = gcal_integration.create_service()
-            if service:
-                gcal_test = "Google Calendar service created successfully"
-            else:
-                gcal_test = "Failed to create Google Calendar service"
-        else:
-            gcal_test = "Google Calendar integration is disabled"
-    except Exception as e:
-        gcal_error = f"Error testing Google Calendar integration: {str(e)}"
-    
-    # Test Supabase connectivity
-    supabase_test = None
-    supabase_error = None
-    try:
-        if is_production:
-            headers = {
-                "apikey": supabase_key,
-                "Authorization": f"Bearer {supabase_key}"
-            }
-            url = f"{supabase_url}/rest/v1/events?limit=1"
-            response = requests.get(url, headers=headers)
-            supabase_test = f"Supabase API response: {response.status_code}"
-        else:
-            supabase_test = "Not in production, Supabase not tested"
-    except Exception as e:
-        supabase_error = f"Error testing Supabase connection: {str(e)}"
-    
-    return jsonify({
-        "environment": "Production" if is_production else "Development",
-        "python_version": sys.version,
-        "available_env_vars": list(env_vars.keys()),
-        "key_env_vars": {
-            "ENABLE_GCAL": os.getenv('ENABLE_GCAL'),
-            "GOOGLE_CALENDAR_ID": os.getenv('GOOGLE_CALENDAR_ID'),
-            "GOOGLE_SERVICE_ACCOUNT_EMAIL": os.getenv('GOOGLE_SERVICE_ACCOUNT_EMAIL'),
-            "SUPABASE_URL": supabase_url,
-            "Project ID": project_id,
-        },
-        "gcal_test": gcal_test,
-        "gcal_error": gcal_error,
-        "supabase_test": supabase_test,
-        "supabase_error": supabase_error
-    })
 
 # For Vercel deployment
 if __name__ == '__main__':
