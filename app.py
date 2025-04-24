@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
 import traceback
+import requests
+import json
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -17,23 +19,15 @@ is_production = os.environ.get('VERCEL', False)
 
 # Get Supabase info for both db connection and diagnostics
 supabase_url = os.getenv('SUPABASE_URL', '')
+supabase_key = os.getenv('SUPABASE_KEY', '')
 project_id = supabase_url.replace('https://', '').split('.')[0] if supabase_url else ''
 
 # Set the database URI based on environment
 if is_production:
-    # For Vercel deployment with Supabase PostgreSQL
-    # Use direct connection to the Supabase PostgreSQL database
-    db_password = os.getenv('SUPABASE_KEY', '')
-    
-    # Construct PostgreSQL connection string for Supabase
-    # Format: postgresql://postgres:[PASSWORD]@db.[PROJECT_ID].supabase.co:5432/postgres
-    db_url = f"postgresql://postgres:{db_password}@db.{project_id}.supabase.co:5432/postgres"
-    app.config['SQLALCHEMY_DATABASE_URI'] = db_url
-    
-    # Log connection info (without password) for debugging
-    print(f"Connecting to Supabase PostgreSQL: db.{project_id}.supabase.co:5432/postgres")
-    print(f"Project ID: {project_id}")
-    print(f"Environment: Production")
+    # For production, we'll use SQLite as a placeholder but not actually use it
+    # Instead, we'll use Supabase REST API for database operations
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    print(f"Environment: Production (Using Supabase REST API)")
 else:
     # Use SQLite for local development
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///events.db'
@@ -44,7 +38,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Initialize database
 db = SQLAlchemy(app)
 
-# Models
+# Models for SQLite (local development)
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
@@ -55,6 +49,45 @@ class Event(db.Model):
     event_link = db.Column(db.String(500), nullable=False)
     tags = db.Column(db.String(500), nullable=False)
     is_starred = db.Column(db.Boolean, default=False)
+
+# Supabase API helper functions
+def supabase_insert(table, data):
+    """Insert data into Supabase using REST API"""
+    if not is_production:
+        return None
+    
+    headers = {
+        "apikey": supabase_key,
+        "Authorization": f"Bearer {supabase_key}",
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+    }
+    
+    url = f"{supabase_url}/rest/v1/{table}"
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    
+    if response.status_code not in (200, 201):
+        raise Exception(f"Supabase API Error: {response.status_code} - {response.text}")
+    
+    return response.json()
+
+def supabase_select(table, query_params=None):
+    """Select data from Supabase using REST API"""
+    if not is_production:
+        return None
+    
+    headers = {
+        "apikey": supabase_key,
+        "Authorization": f"Bearer {supabase_key}"
+    }
+    
+    url = f"{supabase_url}/rest/v1/{table}"
+    response = requests.get(url, headers=headers, params=query_params)
+    
+    if response.status_code != 200:
+        raise Exception(f"Supabase API Error: {response.status_code} - {response.text}")
+    
+    return response.json()
 
 # Routes
 @app.route('/')
@@ -73,17 +106,39 @@ def salon():
 def submit_event():
     if request.method == 'POST':
         try:
-            event = Event(
-                title=request.form['title'],
-                start_time=datetime.strptime(request.form['start_time'], '%Y-%m-%dT%H:%M'),
-                location=request.form['location'],
-                description=request.form['description'],
-                image_url=request.form['image_url'],
-                event_link=request.form['event_link'],
-                tags=','.join(request.form.getlist('tags'))
-            )
-            db.session.add(event)
-            db.session.commit()
+            # Format date for API
+            start_time = datetime.strptime(request.form['start_time'], '%Y-%m-%dT%H:%M')
+            start_time_iso = start_time.isoformat()
+            
+            # Prepare event data
+            event_data = {
+                "title": request.form['title'],
+                "start_time": start_time_iso,
+                "location": request.form['location'],
+                "description": request.form['description'],
+                "image_url": request.form['image_url'],
+                "event_link": request.form['event_link'],
+                "tags": ','.join(request.form.getlist('tags')),
+                "is_starred": False
+            }
+            
+            if is_production:
+                # Use Supabase REST API in production
+                supabase_insert("events", event_data)
+            else:
+                # Use SQLAlchemy in development
+                event = Event(
+                    title=request.form['title'],
+                    start_time=start_time,
+                    location=request.form['location'],
+                    description=request.form['description'],
+                    image_url=request.form['image_url'],
+                    event_link=request.form['event_link'],
+                    tags=','.join(request.form.getlist('tags'))
+                )
+                db.session.add(event)
+                db.session.commit()
+                
             return redirect(url_for('index'))
         except Exception as e:
             # Log the error with traceback for better debugging
@@ -97,52 +152,92 @@ def submit_event():
 @app.route('/api/events')
 def get_events():
     tag = request.args.get('tag')
+    
     try:
-        query = Event.query.filter(Event.start_time >= datetime.now())
-        if tag:
-            query = query.filter(Event.tags.contains(tag))
-        events = query.order_by(Event.start_time).all()
-        
-        return jsonify([{
-            'id': event.id,
-            'title': event.title,
-            'start_time': event.start_time.isoformat(),
-            'location': event.location,
-            'description': event.description,
-            'image_url': event.image_url,
-            'event_link': event.event_link,
-            'tags': event.tags.split(',') if event.tags else [],
-            'is_starred': event.is_starred
-        } for event in events])
+        if is_production:
+            # Use Supabase REST API in production
+            now = datetime.now().isoformat()
+            query_params = {
+                "select": "*",
+                "start_time": f"gte.{now}",
+                "order": "start_time"
+            }
+            
+            if tag:
+                # Filter by tag
+                query_params["tags"] = f"cs.{tag}"
+                
+            events_data = supabase_select("events", query_params)
+            
+            # Format the response
+            return jsonify([{
+                'id': event['id'],
+                'title': event['title'],
+                'start_time': event['start_time'],
+                'location': event['location'],
+                'description': event['description'],
+                'image_url': event['image_url'],
+                'event_link': event['event_link'],
+                'tags': event['tags'].split(',') if event['tags'] else [],
+                'is_starred': event['is_starred']
+            } for event in events_data])
+        else:
+            # Use SQLAlchemy in development
+            query = Event.query.filter(Event.start_time >= datetime.now())
+            if tag:
+                query = query.filter(Event.tags.contains(tag))
+            events = query.order_by(Event.start_time).all()
+            
+            return jsonify([{
+                'id': event.id,
+                'title': event.title,
+                'start_time': event.start_time.isoformat(),
+                'location': event.location,
+                'description': event.description,
+                'image_url': event.image_url,
+                'event_link': event.event_link,
+                'tags': event.tags.split(',') if event.tags else [],
+                'is_starred': event.is_starred
+            } for event in events])
     except Exception as e:
         error_traceback = traceback.format_exc()
         print(f"Error fetching events: {str(e)}\n{error_traceback}")
         return jsonify({"error": str(e), "traceback": error_traceback}), 500
 
-# Add a diagnostic route to check database connection
-@app.route('/db-test')
-def db_test():
+# Add a diagnostic route to check Supabase API connection
+@app.route('/api-test')
+def api_test():
     try:
-        # Try to make a simple query to test the database connection
-        db.session.execute("SELECT 1").fetchone()
+        # Test Supabase API connection
+        headers = {
+            "apikey": supabase_key,
+            "Authorization": f"Bearer {supabase_key}"
+        }
+        
+        url = f"{supabase_url}/rest/v1/events?limit=1"
+        response = requests.get(url, headers=headers)
+        
+        status_code = response.status_code
+        
         return jsonify({
-            "status": "success", 
-            "message": "Database connection successful",
+            "status": "success" if status_code == 200 else "error",
+            "status_code": status_code,
+            "message": "Supabase API connection successful" if status_code == 200 else f"Error: {response.text}",
             "config": {
-                "db_host": f"db.{project_id}.supabase.co" if is_production else "sqlite",
+                "supabase_url": supabase_url,
                 "is_production": is_production,
                 "project_id": project_id
             }
         })
     except Exception as e:
         error_traceback = traceback.format_exc()
-        print(f"Database connection error: {str(e)}\n{error_traceback}")
+        print(f"API connection error: {str(e)}\n{error_traceback}")
         return jsonify({
             "status": "error", 
             "message": str(e),
             "traceback": error_traceback,
             "config": {
-                "db_host": f"db.{project_id}.supabase.co" if is_production else "sqlite",
+                "supabase_url": supabase_url,
                 "is_production": is_production,
                 "project_id": project_id
             }
