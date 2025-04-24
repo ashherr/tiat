@@ -1,14 +1,18 @@
--- Create the events table in Supabase
+-- Create the events table with updated fields for Google Calendar integration
 CREATE TABLE IF NOT EXISTS events (
-    id SERIAL PRIMARY KEY,
-    title TEXT NOT NULL,
-    start_time TIMESTAMP WITH TIME ZONE NOT NULL,
-    location TEXT NOT NULL,
-    description TEXT NOT NULL,
-    image_url TEXT NOT NULL,
-    event_link TEXT NOT NULL,
-    tags TEXT NOT NULL,
-    is_starred BOOLEAN DEFAULT FALSE
+    id bigint primary key generated always as identity,
+    title varchar(200) not null,
+    start_time timestamptz not null,
+    end_time timestamptz not null,
+    location varchar(200) not null,
+    description text not null,
+    image_url varchar(500) not null,
+    event_link varchar(500) not null,
+    tags varchar(500) not null,
+    is_starred boolean default false,
+    organizer_email varchar(200) not null,
+    calendar_event_id varchar(200),
+    created_at timestamptz default now()
 );
 
 -- Create index on start_time for faster queries by date
@@ -46,4 +50,20 @@ CREATE POLICY "Allow service role full access" ON events
     FOR ALL
     TO service_role
     USING (true)
-    WITH CHECK (true); 
+    WITH CHECK (true);
+
+-- Allow anyone to select (read) events
+CREATE POLICY "Anyone can view events"
+    ON events FOR SELECT
+    TO anon, authenticated
+    USING (true);
+
+-- Only allow authenticated admin users to insert, update, or delete events
+CREATE POLICY "Only admins can modify events"
+    ON events FOR ALL
+    TO authenticated
+    USING (auth.uid() IN (SELECT auth.uid() FROM admin_users))
+    WITH CHECK (auth.uid() IN (SELECT auth.uid() FROM admin_users));
+
+-- In production, you would also need to create the admin_users table
+-- and add your admin users to it 

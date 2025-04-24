@@ -35,36 +35,78 @@
         .required { color: red; font-size: 10px; margin-left: 3px; }
         .back-link {
             display: block;
-            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .time-group {
+            display: flex;
+            gap: 10px;
+        }
+        .time-input {
+            flex: 1;
+        }
+        .help-text {
+            font-size: 11px;
+            color: #555;
+            margin-top: 3px;
+        }
+        fieldset {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 15px;
+        }
+        legend {
+            font-size: 14px;
+            padding: 0 5px;
         }
     </style>
 </head>
 <body>
     <h1>Submit Event</h1>
+    <p class="back-link"><a href="{{ url_for('index') }}">Back to Events</a></p>
+    
     <form method="POST" onsubmit="return validateForm()">
-        <label>Event Name:
+        <label>Event Name: <span class="required">*</span>
             <input type="text" name="title" required>
         </label>
         
-        <label>Event Time:
-            <input type="datetime-local" name="start_time" required>
-        </label>
+        <div class="time-group">
+            <div class="time-input">
+                <label>Start Time: <span class="required">*</span>
+                    <input type="datetime-local" name="start_time" id="start_time" required>
+                </label>
+            </div>
+            <div class="time-input">
+                <label>End Time: <span class="required">*</span>
+                    <input type="datetime-local" name="end_time" id="end_time" required>
+                    <div class="help-text">Set to at least 2 hours after start time</div>
+                </label>
+            </div>
+        </div>
         
-        <label>Location:
+        <label>Location: <span class="required">*</span>
             <input type="text" name="location" required>
         </label>
         
-        <label>Description:
+        <label>Description: <span class="required">*</span>
             <textarea name="description" rows="4" required></textarea>
         </label>
         
-        <label>Image URL:
+        <label>Image URL: <span class="required">*</span>
             <input type="url" name="image_url" required>
         </label>
         
-        <label>Event Link:
+        <label>Event Link: <span class="required">*</span>
             <input type="url" name="event_link" required>
         </label>
+        
+        <fieldset>
+            <legend>Calendar Integration</legend>
+            <p class="help-text">Events will be added to our public Google Calendar for others to subscribe to.</p>
+            <label>Organizer Email: <span class="required">*</span>
+                <input type="email" name="organizer_email" placeholder="your@email.com" required>
+                <div class="help-text">Will be shown as the event organizer in the calendar.</div>
+            </label>
+        </fieldset>
         
         <div class="tags">
             <label>Tags: <span class="required">(at least one required)</span></label>
@@ -80,9 +122,30 @@
         
         <p><button type="submit">Submit Event</button></p>
     </form>
-    <p class="back-link"><a href="{{ url_for('index') }}">Back to Events</a></p>
 
     <script>
+        // Set default end time when start time changes
+        document.getElementById('start_time').addEventListener('change', function() {
+            const startTime = new Date(this.value);
+            // Add 2 hours to start time
+            const endTime = new Date(startTime.getTime() + (2 * 60 * 60 * 1000));
+            
+            // Format for datetime-local input
+            const endTimeStr = endTime.toISOString().slice(0, 16);
+            document.getElementById('end_time').value = endTimeStr;
+        });
+        
+        // Also set initial end time when the page loads if start time has a value
+        window.addEventListener('DOMContentLoaded', function() {
+            const startTimeInput = document.getElementById('start_time');
+            if (startTimeInput.value) {
+                const startTime = new Date(startTimeInput.value);
+                const endTime = new Date(startTime.getTime() + (2 * 60 * 60 * 1000));
+                const endTimeStr = endTime.toISOString().slice(0, 16);
+                document.getElementById('end_time').value = endTimeStr;
+            }
+        });
+        
         function validateForm() {
             const checkboxes = document.querySelectorAll('input[name="tags"]');
             let checked = false;

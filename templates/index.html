@@ -96,6 +96,7 @@
     <h2>creative technology in san francisco</h2>
     <br>
     <a href="{{ url_for('salons') }}" class="salon-link">our salons</a>
+    <a href="{{ url_for('calendar') }}" class="salon-link">subscribe to calendar</a>
 
     <div class="tags">
         <span class="filter-label">filter:</span>
@@ -159,6 +160,9 @@
                     
                     events.forEach(event => {
                         const date = new Date(event.start_time).toLocaleDateString();
+                        console.log(`Event on ${date}: ${event.title}`);
+                        
+                        // Only create a new date header if this is a new date
                         if (date !== currentDate) {
                             currentDate = date;
                             const dateDiv = document.createElement('div');
@@ -167,6 +171,7 @@
                             eventsDiv.appendChild(dateDiv);
                         }
                         
+                        // Always create the event link for each event
                         const eventLink = document.createElement('a');
                         eventLink.className = 'event';
                         eventLink.href = event.event_link;

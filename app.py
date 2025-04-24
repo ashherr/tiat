@@ -1,12 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import traceback
 import requests
 import json
 from dotenv import load_dotenv
+# Import Google Calendar integration
+import gcal_integration
 
 # Load environment variables
 load_dotenv()
@@ -44,12 +46,15 @@ class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     start_time = db.Column(db.DateTime, nullable=False)
+    end_time = db.Column(db.DateTime, nullable=False)  # Changed to nullable=False
     location = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String(500), nullable=False)
     event_link = db.Column(db.String(500), nullable=False)
     tags = db.Column(db.String(500), nullable=False)
     is_starred = db.Column(db.Boolean, default=False)
+    organizer_email = db.Column(db.String(200), nullable=False)  # Changed to nullable=False
+    calendar_event_id = db.Column(db.String(200), nullable=True)  # New field to store Google Calendar event ID
 
 # Supabase API helper functions
 def supabase_insert(table, data):
@@ -129,6 +134,16 @@ def salons():
 def salon():
     return redirect(url_for('salons'))
 
+@app.route('/calendar')
+def calendar():
+    calendar_info = gcal_integration.get_calendar_info()
+    
+    return render_template('calendar.html',
+                          calendar_id=calendar_info['calendar_id'],
+                          google_url=calendar_info['html_link'],
+                          ical_url=calendar_info['ical_url'],
+                          embed_html=calendar_info['embed_html'])
+
 @app.route('/submit', methods=['GET', 'POST'])
 def submit_event():
     if request.method == 'POST':
@@ -137,19 +152,40 @@ def submit_event():
             start_time = datetime.strptime(request.form['start_time'], '%Y-%m-%dT%H:%M')
             start_time_iso = start_time.isoformat()
             
+            # Handle end time - now required
+            end_time = datetime.strptime(request.form['end_time'], '%Y-%m-%dT%H:%M')
+            end_time_iso = end_time.isoformat()
+            
             # Prepare event data
             event_data = {
                 "title": request.form['title'],
                 "start_time": start_time_iso,
+                "end_time": end_time_iso,
                 "location": request.form['location'],
                 "description": request.form['description'],
                 "image_url": request.form['image_url'],
                 "event_link": request.form['event_link'],
                 "tags": ','.join(request.form.getlist('tags')),
-                "is_starred": False
+                "is_starred": False,
+                "organizer_email": request.form['organizer_email']  # Now required field
             }
             
             print(f"Attempting to insert event: {event_data}")
+            
+            # Add to Google Calendar if enabled
+            calendar_event_id = None
+            if os.getenv('ENABLE_GCAL', 'false').lower() == 'true':
+                try:
+                    print("Adding event to Google Calendar...")
+                    calendar_event_id = gcal_integration.add_event_to_calendar(event_data)
+                    if calendar_event_id:
+                        event_data["calendar_event_id"] = calendar_event_id
+                        print(f"Event added to Google Calendar with ID: {calendar_event_id}")
+                    else:
+                        print("Failed to add event to Google Calendar")
+                except Exception as gcal_error:
+                    print(f"Google Calendar error: {str(gcal_error)}")
+                    # Continue with database insertion even if calendar fails
             
             if is_production:
                 # Use Supabase REST API in production
@@ -160,11 +196,14 @@ def submit_event():
                 event = Event(
                     title=request.form['title'],
                     start_time=start_time,
+                    end_time=end_time,
                     location=request.form['location'],
                     description=request.form['description'],
                     image_url=request.form['image_url'],
                     event_link=request.form['event_link'],
-                    tags=','.join(request.form.getlist('tags'))
+                    tags=','.join(request.form.getlist('tags')),
+                    organizer_email=request.form['organizer_email'], # Now directly use required field
+                    calendar_event_id=calendar_event_id
                 )
                 db.session.add(event)
                 db.session.commit()
@@ -335,7 +374,13 @@ def submit_static():
 
 # For Vercel deployment
 if __name__ == '__main__':
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Run the Bay Area Creative Tech Events app')
+    parser.add_argument('--port', type=int, default=5000, help='Port to run the app on')
+    args = parser.parse_args()
+    
     with app.app_context():
         db.create_all()
-    app.run(debug=False) 
+    app.run(debug=False, port=args.port) 
 

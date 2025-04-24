@@ -4,13 +4,13 @@ A minimal, fast-performing website for aggregating creative technology events in
 
 ## Features
 
-- Google Sign-in authentication
-- Event submission for authenticated users
+- Event submission for anyone
 - Minimal, text-based event listing
 - Hover to preview event details and images
 - Tag-based filtering
-- Admin dashboard for event moderation
+- Google Calendar integration for events
 - Star system for featured events
+- Mobile responsive design
 
 ## Setup
 
@@ -25,33 +25,56 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. Create a `.env` file with the following variables:
+3. Create a `.env` file by copying the example:
+```bash
+cp env.example .env
 ```
-SECRET_KEY=your-secret-key
-GOOGLE_CLIENT_ID=your-google-client-id
-```
+Then edit the `.env` file with your configuration values.
 
 4. Initialize the database:
+```bash
+python init_db.py
+```
+
+5. Start the app:
 ```bash
 flask run
 ```
 
-5. To make a user an admin, use the Flask shell:
-```bash
-flask shell
->>> from app import db, User
->>> user = User.query.filter_by(email='admin@example.com').first()
->>> user.is_admin = True
->>> db.session.commit()
+## Google Calendar Integration
+
+To enable Google Calendar integration:
+
+1. Create a project in the [Google Cloud Console](https://console.cloud.google.com/)
+2. Enable the Google Calendar API
+3. Create a service account with Calendar API permissions
+4. Download the service account credentials JSON file and save it to `credentials/service_account.json`
+5. Share your Google Calendar with the service account email
+6. Update the `.env` file with:
 ```
+ENABLE_GCAL=true
+GOOGLE_CREDENTIALS_FILE=credentials/service_account.json
+GOOGLE_CALENDAR_ID=your-calendar-id@group.calendar.google.com
+```
+
+Users can subscribe to your public calendar by visiting the `/calendar` page.
+
+## Database Schema Updates
+
+After updating the database schema, run the update script:
+```bash
+python update_db.py
+```
+
+For production (Supabase), run the SQL commands manually as specified in `supabase_table.sql`.
 
 ## Development
 
 The application uses:
 - Flask for the backend
-- SQLite for the database
-- Google Sign-In for authentication
-- Minimal HTML/JavaScript for the frontend
+- SQLite for development, Supabase PostgreSQL for production
+- Minimal HTML/CSS/JavaScript for the frontend
+- Google Calendar API for event synchronization
 
 ## License
 
