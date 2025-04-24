@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Intersection of Art & Technology</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kosugi&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='responsive.css') }}">
     <style>
         body { 
             font-family: 'Kosugi', sans-serif; 
@@ -109,16 +112,42 @@
     <div id="preview" class="preview"></div>
 
     <script>
+        // Check if it's a touch device
+        const isTouchDevice = () => {
+            return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        };
+        
         function loadEvents(tag = null) {
             let url = '/api/events';
             if (tag) {
                 url += `?tag=${tag}`;
             }
             fetch(url)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(events => {
+                    // Make sure events is always an array
+                    if (!Array.isArray(events)) {
+                        console.error('API response is not an array:', events);
+                        events = [];
+                    }
+                    
                     const eventsDiv = document.getElementById('events');
                     eventsDiv.innerHTML = '';
+                    
+                    // Show message if no events
+                    if (events.length === 0) {
+                        const noEventsMsg = document.createElement('p');
+                        noEventsMsg.textContent = tag ? `No upcoming events with tag "${tag}"` : 'No upcoming events';
+                        noEventsMsg.style.marginLeft = '20px';
+                        eventsDiv.appendChild(noEventsMsg);
+                        return;
+                    }
+                    
                     let currentDate = null;
                     
                     events.forEach(event => {
@@ -140,21 +169,55 @@
                             ${new Date(event.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${event.title} - ${event.location}
                         `;
                         
-                        eventLink.onmouseover = () => {
-                            const preview = document.getElementById('preview');
-                            preview.innerHTML = `
-                                <img src="${event.image_url}" alt="${event.title}">
-                                <p>${event.description}</p>
-                            `;
-                            preview.style.display = 'block';
-                        };
-                        
-                        eventLink.onmouseout = () => {
-                            document.getElementById('preview').style.display = 'none';
-                        };
+                        if (isTouchDevice()) {
+                            // For touch devices, show preview on click/tap
+                            eventLink.addEventListener('click', function(e) {
+                                // Only show preview if not already shown
+                                const preview = document.getElementById('preview');
+                                if (preview.style.display !== 'block') {
+                                    e.preventDefault(); // Prevent following the link first time
+                                    
+                                    // Hide any previously shown previews
+                                    preview.classList.add('preview-active');
+                                    preview.innerHTML = `
+                                        <img src="${event.image_url}" alt="${event.title}">
+                                        <p>${event.description}</p>
+                                        <p>Tap again to visit event page</p>
+                                    `;
+                                    preview.style.display = 'block';
+                                    
+                                    // Add click event to dismiss preview
+                                    document.addEventListener('click', function dismissPreview(e) {
+                                        if (!preview.contains(e.target) && e.target !== eventLink) {
+                                            preview.style.display = 'none';
+                                            document.removeEventListener('click', dismissPreview);
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            // For non-touch devices, use hover as before
+                            eventLink.onmouseover = () => {
+                                const preview = document.getElementById('preview');
+                                preview.innerHTML = `
+                                    <img src="${event.image_url}" alt="${event.title}">
+                                    <p>${event.description}</p>
+                                `;
+                                preview.style.display = 'block';
+                            };
+                            
+                            eventLink.onmouseout = () => {
+                                document.getElementById('preview').style.display = 'none';
+                            };
+                        }
                         
                         eventsDiv.appendChild(eventLink);
                     });
+                })
+                .catch(error => {
+                    console.error('Error fetching events:', error);
+                    const eventsDiv = document.getElementById('events');
+                    eventsDiv.innerHTML = `<p style="margin-left: 20px">Error loading events: ${error.message}</p>`;
                 });
         }
 

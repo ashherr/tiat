@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   // Image collections from the original script
-  const imageUrlsByHeading = {
+  window.imageUrlsByHeading = {
     "Demos from event 1": [
       "https://i.postimg.cc/QMdPQRzg/tiat1.png"
     ],
@@ -52,39 +52,16 @@ document.addEventListener('DOMContentLoaded', function() {
   // Get all event headings
   const eventHeadings = document.querySelectorAll('.event-heading');
   
-  // Setup each event heading with images and cycling functionality
+  // Setup each event heading with initial images
   eventHeadings.forEach(heading => {
     const imageElement = heading.querySelector('.event-image');
     const headingData = heading.getAttribute('data-heading');
-    const imageUrls = imageUrlsByHeading[headingData];
+    const imageUrls = window.imageUrlsByHeading[headingData];
     
     // Skip if no images for this heading
     if (!imageUrls || imageUrls.length === 0) return;
     
-    let currentIndex = 0;
-    let intervalId;
-    
     // Set initial image
     imageElement.src = imageUrls[0];
-    
-    // Function to cycle through images
-    function cycleImages() {
-      imageElement.src = imageUrls[currentIndex];
-      currentIndex = (currentIndex + 1) % imageUrls.length;
-    }
-    
-    // Add hover event listeners
-    heading.addEventListener('mouseover', () => {
-      imageElement.style.display = 'block';
-      // Only set interval if there are multiple images
-      if (imageUrls.length > 1) {
-        intervalId = setInterval(cycleImages, 800); // Change image every 0.8 seconds
-      }
-    });
-    
-    heading.addEventListener('mouseout', () => {
-      imageElement.style.display = 'none';
-      clearInterval(intervalId); // Stop the image cycling
-    });
   });
 }); 

@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit Event</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kosugi&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='responsive.css') }}">
     <style>
         body { 
             font-family: 'Kosugi', sans-serif; 
@@ -20,11 +23,20 @@
             font-family: 'Kosugi', sans-serif;
             font-size: 13px;
         }
-        button { font-size: 13px; font-family: 'Kosugi', sans-serif; }
+        button { 
+            font-size: 13px; 
+            font-family: 'Kosugi', sans-serif; 
+            padding: 6px 12px;
+            cursor: pointer;
+        }
         .tags { margin-top: 10px; }
         .tag-item { display: inline-block; margin-right: 15px; font-size: 12px; }
         a { font-size: 13px; }
         .required { color: red; font-size: 10px; margin-left: 3px; }
+        .back-link {
+            display: block;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -56,7 +68,7 @@
         
         <div class="tags">
             <label>Tags: <span class="required">(at least one required)</span></label>
-            <div>
+            <div class="tag-container">
                 {% for tag in ['generative', 'hardware', 'internet', 'projection', 'installation', 'XR', 'sound', 'AI / ML', 'speculative', 'data', 'fabrication'] %}
                     <div class="tag-item">
                         <input type="checkbox" name="tags" value="{{ tag }}" id="tag-{{ tag }}">
@@ -68,7 +80,7 @@
         
         <p><button type="submit">Submit Event</button></p>
     </form>
-    <p><a href="{{ url_for('index') }}">Back to Events</a></p>
+    <p class="back-link"><a href="{{ url_for('index') }}">Back to Events</a></p>
 
     <script>
         function validateForm() {
