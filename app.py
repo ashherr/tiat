@@ -56,6 +56,7 @@ def supabase_insert(table, data):
     if not is_production:
         return None
     
+    # Use service role key for bypassing RLS
     headers = {
         "apikey": supabase_key,
         "Authorization": f"Bearer {supabase_key}",
@@ -63,10 +64,16 @@ def supabase_insert(table, data):
         "Prefer": "return=representation"
     }
     
+    # Direct insert bypassing RLS using service role
     url = f"{supabase_url}/rest/v1/{table}"
     response = requests.post(url, headers=headers, data=json.dumps(data))
     
     if response.status_code not in (200, 201):
+        # Print detailed error info
+        print(f"Supabase API Error: {response.status_code} - {response.text}")
+        print(f"Request URL: {url}")
+        print(f"Request Headers: {headers}")
+        print(f"Request Data: {data}")
         raise Exception(f"Supabase API Error: {response.status_code} - {response.text}")
     
     return response.json()
@@ -76,6 +83,7 @@ def supabase_select(table, query_params=None):
     if not is_production:
         return None
     
+    # Use service role key for bypassing RLS
     headers = {
         "apikey": supabase_key,
         "Authorization": f"Bearer {supabase_key}"
@@ -85,6 +93,10 @@ def supabase_select(table, query_params=None):
     response = requests.get(url, headers=headers, params=query_params)
     
     if response.status_code != 200:
+        print(f"Supabase API Error: {response.status_code} - {response.text}")
+        print(f"Request URL: {url}")
+        print(f"Request Headers: {headers}")
+        print(f"Request Params: {query_params}")
         raise Exception(f"Supabase API Error: {response.status_code} - {response.text}")
     
     return response.json()
@@ -122,9 +134,12 @@ def submit_event():
                 "is_starred": False
             }
             
+            print(f"Attempting to insert event: {event_data}")
+            
             if is_production:
                 # Use Supabase REST API in production
-                supabase_insert("events", event_data)
+                result = supabase_insert("events", event_data)
+                print(f"Insert successful: {result}")
             else:
                 # Use SQLAlchemy in development
                 event = Event(
@@ -219,10 +234,34 @@ def api_test():
         
         status_code = response.status_code
         
+        # Test table creation permission
+        create_test = None
+        create_error = None
+        try:
+            test_headers = {
+                "apikey": supabase_key,
+                "Authorization": f"Bearer {supabase_key}",
+                "Content-Type": "application/json",
+                "Prefer": "return=representation"
+            }
+            test_url = f"{supabase_url}/rest/v1/events"
+            test_data = {"title": "API Test", "start_time": datetime.now().isoformat(), 
+                        "location": "Test", "description": "Test", "image_url": "https://example.com/test.jpg",
+                        "event_link": "https://example.com", "tags": "test"}
+            test_response = requests.post(test_url, headers=test_headers, data=json.dumps(test_data))
+            create_test = {
+                "status_code": test_response.status_code,
+                "response": test_response.text
+            }
+        except Exception as e:
+            create_error = str(e)
+        
         return jsonify({
             "status": "success" if status_code == 200 else "error",
             "status_code": status_code,
             "message": "Supabase API connection successful" if status_code == 200 else f"Error: {response.text}",
+            "create_test": create_test,
+            "create_error": create_error,
             "config": {
                 "supabase_url": supabase_url,
                 "is_production": is_production,
