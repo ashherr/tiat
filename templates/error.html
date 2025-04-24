@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Error - The Intersection of Art & Technology</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Kosugi', sans-serif; 
+            margin: 20px;
+            font-size: 14px; 
+        }
+        h1 { 
+            font-size: 20px; 
+            margin-top: 30px;
+        }
+        .error-details {
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-left: 3px solid #ff0000;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>An Error Occurred</h1>
+    <p>Sorry, we encountered a problem while processing your request. The details of the error are shown below:</p>
+    
+    <div class="error-details">
+        {{ error }}
+    </div>
+    
+    <p>Please try again later or contact the site administrator if the problem persists.</p>
+    
+    <p><a href="{{ url_for('index') }}">Return to Home Page</a></p>
+</body>
+</html> 
