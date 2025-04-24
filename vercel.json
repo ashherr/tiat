@@ -17,7 +17,7 @@
       },
       {
         "src": "/(.*)",
-        "dest": "/api/flask_app.py"
+        "dest": "/api/simple.py"
       }
     ],
     "env": {
