@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from datetime import datetime
 import os
 import traceback
@@ -90,16 +91,30 @@ def supabase_select(table, query_params=None):
     }
     
     url = f"{supabase_url}/rest/v1/{table}"
+    
+    # Print detailed request info for debugging
+    print(f"Supabase Request URL: {url}")
+    print(f"Supabase Request Headers: {headers}")
+    print(f"Supabase Request Params: {query_params}")
+    
     response = requests.get(url, headers=headers, params=query_params)
+    
+    # Print response status and headers for debugging
+    print(f"Supabase Response Status: {response.status_code}")
+    print(f"Supabase Response Headers: {response.headers}")
     
     if response.status_code != 200:
         print(f"Supabase API Error: {response.status_code} - {response.text}")
-        print(f"Request URL: {url}")
-        print(f"Request Headers: {headers}")
-        print(f"Request Params: {query_params}")
         raise Exception(f"Supabase API Error: {response.status_code} - {response.text}")
     
-    return response.json()
+    try:
+        data = response.json()
+        print(f"Supabase Response Data Count: {len(data)}")
+        return data
+    except Exception as e:
+        print(f"Error parsing Supabase response: {str(e)}")
+        print(f"Response Content: {response.text[:200]}...")  # Show first 200 chars
+        raise Exception(f"Error parsing Supabase response: {str(e)}")
 
 # Routes
 @app.route('/')
@@ -172,6 +187,12 @@ def get_events():
         if is_production:
             # Use Supabase REST API in production
             now = datetime.now().isoformat()
+            
+            # Print for debugging
+            print(f"Production API call - filtering by tag: '{tag}'")
+            print(f"Using Supabase URL: {supabase_url}")
+            
+            # Basic query parameters
             query_params = {
                 "select": "*",
                 "start_time": f"gte.{now}",
@@ -179,30 +200,41 @@ def get_events():
             }
             
             if tag:
-                # Filter by tag - use cs (contains) for comma-separated values
-                query_params["tags"] = f"cs.{tag}"
-                
-            events_data = supabase_select("events", query_params)
+                # Simply use the tag as provided in Supabase query
+                # For Supabase, the correct format for filtering on a comma-separated list is ilike
+                query_params["tags"] = f"ilike.%{tag}%"
+                print(f"Supabase query params: {query_params}")
             
-            # Format the response
-            return jsonify([{
-                'id': event['id'],
-                'title': event['title'],
-                'start_time': event['start_time'],
-                'location': event['location'],
-                'description': event['description'],
-                'image_url': event['image_url'],
-                'event_link': event['event_link'],
-                'tags': event['tags'].split(',') if event['tags'] else [],
-                'is_starred': event['is_starred']
-            } for event in events_data])
+            try:
+                events_data = supabase_select("events", query_params)
+                print(f"Supabase returned {len(events_data)} events")
+                
+                # Format the response
+                return jsonify([{
+                    'id': event['id'],
+                    'title': event['title'],
+                    'start_time': event['start_time'],
+                    'location': event['location'],
+                    'description': event['description'],
+                    'image_url': event['image_url'],
+                    'event_link': event['event_link'],
+                    'tags': event['tags'].split(',') if event['tags'] else [],
+                    'is_starred': event['is_starred']
+                } for event in events_data])
+            except Exception as supabase_error:
+                print(f"Supabase API error: {str(supabase_error)}")
+                # Fallback: return empty list instead of error
+                print("Returning empty list as fallback")
+                return jsonify([])
         else:
             # Use SQLAlchemy in development
             query = Event.query.filter(Event.start_time >= datetime.now())
             
             if tag:
-                # Ensure proper tag filtering for SQLite
-                # For comma-separated tags, we need to use LIKE with wildcards
+                # Print for debugging
+                print(f"Filtering by tag: '{tag}'")
+                
+                # For SQLite, simple pattern matching should work
                 tag_pattern = f"%{tag}%"
                 query = query.filter(Event.tags.like(tag_pattern))
                 
@@ -226,7 +258,8 @@ def get_events():
     except Exception as e:
         error_traceback = traceback.format_exc()
         print(f"Error fetching events: {str(e)}\n{error_traceback}")
-        return jsonify({"error": str(e), "traceback": error_traceback}), 500
+        # Return empty list instead of error for better user experience
+        return jsonify([]), 200
 
 # Add a diagnostic route to check Supabase API connection
 @app.route('/api-test')
