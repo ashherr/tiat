@@ -8,6 +8,7 @@ CREATE TABLE events (
   location TEXT NOT NULL,
   description TEXT NOT NULL,
   image_url TEXT,
+  event_url TEXT,
   tags TEXT[] DEFAULT '{}',
   is_featured BOOLEAN DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
