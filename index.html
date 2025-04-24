@@ -85,13 +85,18 @@
             background-color: #f0f0f0;
             font-weight: bold;
         }
-        .star { color: gold; }
+        .star { 
+            color: gold; 
+            font-size: 18px;
+            display: inline-block;
+            margin-right: 4px;
+        }
     </style>
 </head>
 <body>
     <h1>the intersection of art & technology</h1>
     <h2>every bay area art + technology event happening soon</h2>
-    <a href="salons.html" class="salon-link">tiat salons</a>
+    <a href="/salons" class="salon-link"><span class="star">⭐</span> tiat salons</a>
 
     <div class="tags">
         <span class="filter-label">filter:</span>
@@ -110,7 +115,7 @@
     </div>
     
     <div class="submit-button">
-        <a href="submit.html">Submit New Event</a>
+        <a href="/submit">Submit New Event</a>
     </div>
 
     <div id="events"></div>
