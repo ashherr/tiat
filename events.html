@@ -94,6 +94,8 @@
         background-color: #f0f0f0;
         border: none;
         cursor: pointer;
+        font-family: 'Kosugi', sans-serif;
+        font-size: 14px;
       }
       .filters {
         margin-top: 15px;
@@ -107,12 +109,22 @@
       .submit-link:hover {
         text-decoration: underline;
       }
+      /* Style for the submit event button */
+      .submit-button {
+        padding: 8px 16px;
+        background-color: #f0f0f0;
+        border: none;
+        cursor: pointer;
+        font-family: 'Kosugi', sans-serif;
+        font-size: 14px;
+        margin-bottom: 15px;
+      }
     </style>
   </head>
   <body>
     <h1>events | <a href="index.html">tiat.place</a></h1>
     
-    <a href="#" id="submit-event" class="submit-link">submit an event</a>
+    <button id="submit-event" class="submit-button">submit an event</button>
     
     <div class="filters">
       <span>filter: </span>
@@ -159,21 +171,21 @@
           <input type="text" id="event-location" required>
         </div>
         <div>
+          <label for="event-image">Image URL:</label>
+          <input type="url" id="event-image" placeholder="https://..." required>
+        </div>
+        <div>
           <label for="event-url">Event URL:</label>
-          <input type="url" id="event-url" placeholder="https://...">
+          <input type="url" id="event-url" placeholder="https://..." required>
         </div>
         <div>
           <label for="event-description">Description:</label>
           <textarea id="event-description" rows="4" required></textarea>
         </div>
         <div>
-          <label for="event-image">Image URL:</label>
-          <input type="url" id="event-image">
-        </div>
-        <div>
-          <label>Tags:</label>
+          <label>Tags (select at least one):</label>
           <div id="tag-checkboxes">
-            <label><input type="checkbox" name="tags" value="generative"> generative</label>
+            <label><input type="checkbox" name="tags" value="generative" required> generative</label>
             <label><input type="checkbox" name="tags" value="hardware"> hardware</label>
             <label><input type="checkbox" name="tags" value="internet"> internet</label>
             <label><input type="checkbox" name="tags" value="projection"> projection</label>
@@ -199,8 +211,7 @@
       const eventForm = document.getElementById('event-form');
       
       // Toggle submission form display
-      submitButton.addEventListener('click', function(e) {
-        e.preventDefault();
+      submitButton.addEventListener('click', function() {
         submissionForm.style.display = 'block';
       });
       
