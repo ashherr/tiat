@@ -1,6 +1,58 @@
-# Bay Area Creative Tech Events
+# TIAT - Technology in Art
 
-A minimal, fast-performing website for aggregating creative technology events in the Bay Area.
+This is the repository for the "Technology in Art" (TIAT) website, a platform for sharing technology/art events and salons in the Bay Area.
+
+## Current Status
+
+The site is currently running in recovery mode after encountering deployment issues. We've restructured the site with the following changes:
+
+1. **Simplified Architecture**: The site now uses Vercel serverless functions for all routes
+2. **New Site Structure**:
+   - Home page (`/`) now shows Salons (previously on `/salons`)
+   - Events now have a dedicated page at `/events` (previously on the home page)
+   - Submission form is at `/submit` for both events and salons
+
+## Development
+
+### Local Development
+
+1. Clone the repository
+2. Install dependencies: `pip install -r requirements.txt`
+3. Run the local server: `python app.py`
+
+### Deployment
+
+The site is deployed on Vercel. The deployment configuration is in `vercel.json`.
+
+Current endpoints:
+- `/` - Home page (Salons)
+- `/events` - Events listing
+- `/submit` - Submission form
+- `/status` - Server status information
+- `/recovery` - Recovery status page
+- `/api/events` - API endpoint for events data
+
+## API
+
+### Events API
+
+Fetch events data with: `/api/events` 
+
+Query parameters:
+- `tag` - Filter events by tag
+
+Example: `/api/events?tag=workshop`
+
+## Future Plans
+
+1. Re-enable database integration with proper error handling
+2. Restore Google Calendar integration
+3. Add authentication for event submission
+4. Enhance the UI and design
+
+## Contributing
+
+Contributions are welcome! Please open an issue or pull request for any enhancements.
 
 ## Features
 
