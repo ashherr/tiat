@@ -160,6 +160,9 @@
                     
                     events.forEach(event => {
                         const date = new Date(event.start_time).toLocaleDateString();
+                        console.log(`Event on ${date}: ${event.title}`);
+                        
+                        // Only create a new date header if this is a new date
                         if (date !== currentDate) {
                             currentDate = date;
                             const dateDiv = document.createElement('div');
@@ -168,6 +171,7 @@
                             eventsDiv.appendChild(dateDiv);
                         }
                         
+                        // Always create the event link for each event
                         const eventLink = document.createElement('a');
                         eventLink.className = 'event';
                         eventLink.href = event.event_link;
