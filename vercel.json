@@ -13,7 +13,8 @@
       }
     ],
     "env": {
-      "VERCEL": "1"
+      "VERCEL": "1",
+      "VERCEL_REGION": "us-east-1"
     },
     "build": {
       "env": {

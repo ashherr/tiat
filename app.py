@@ -17,17 +17,18 @@ is_production = os.environ.get('VERCEL', False)
 # Set the database URI based on environment
 if is_production:
     # For Vercel deployment with Supabase PostgreSQL
-    # The database connection will be configured via environment variables in Vercel
-    # Format: postgresql://username:password@host:port/database
-    # We'll create a direct PostgreSQL connection string for Supabase
-    db_user = "postgres"
+    # The direct connection string approach wasn't working due to socket issues
+    # Instead, use a connection string that works with Vercel and Supabase
+    supabase_url = os.getenv('SUPABASE_URL', '').replace('https://', '')
     db_password = os.getenv('SUPABASE_KEY', '')
-    db_host = "db." + os.getenv('SUPABASE_URL', '').replace('https://', '')
-    db_port = "5432"
-    db_name = "postgres"
     
-    # Construct the PostgreSQL connection string
-    db_url = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+    # Connection string format for Supabase from Vercel
+    # Use the hostname without db. prefix to avoid socket address family issues
+    # Separate the project ID from the hostname
+    project_id = supabase_url.split('.')[0]
+    
+    # PostgreSQL connection string for Supabase
+    db_url = f"postgresql://postgres:{db_password}@aws-0-{os.getenv('VERCEL_REGION', 'us-east-1')}.pooler.supabase.com:5432/postgres"
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 else:
     # Use SQLite for local development
