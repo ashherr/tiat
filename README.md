@@ -48,16 +48,38 @@ To enable Google Calendar integration:
 1. Create a project in the [Google Cloud Console](https://console.cloud.google.com/)
 2. Enable the Google Calendar API
 3. Create a service account with Calendar API permissions
-4. Download the service account credentials JSON file and save it to `credentials/service_account.json`
+4. You have two options for credentials management:
+
+   **Option 1: Environment Variables (RECOMMENDED for security):**
+   - Get the credentials JSON and extract the values into environment variables in your `.env` file:
+   ```
+   ENABLE_GCAL=true
+   GOOGLE_CLIENT_ID=your-client-id-here.apps.googleusercontent.com
+   GOOGLE_CLIENT_SECRET=your-client-secret-here
+   GOOGLE_PROJECT_ID=your-project-id
+   GOOGLE_CALENDAR_ID=your-calendar-id@group.calendar.google.com
+   ```
+
+   **Option 2: Service Account JSON File (less secure):**
+   - Download the service account credentials JSON file and save it to `credentials/service_account.json`
+   - Add this file to your `.gitignore` to prevent accidental exposure
+   - Update the `.env` file with:
+   ```
+   ENABLE_GCAL=true
+   GOOGLE_CREDENTIALS_FILE=credentials/service_account.json
+   GOOGLE_CALENDAR_ID=your-calendar-id@group.calendar.google.com
+   ```
+
 5. Share your Google Calendar with the service account email
-6. Update the `.env` file with:
-```
-ENABLE_GCAL=true
-GOOGLE_CREDENTIALS_FILE=credentials/service_account.json
-GOOGLE_CALENDAR_ID=your-calendar-id@group.calendar.google.com
-```
 
 Users can subscribe to your public calendar by visiting the `/calendar` page.
+
+## Security Best Practices
+
+- Never commit credentials or API keys to your repository
+- Use environment variables for secrets rather than files
+- Make sure `.env` and other credentials files are in your `.gitignore`
+- If you accidentally commit sensitive information, follow GitHub's guide to [remove sensitive data](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository)
 
 ## Database Schema Updates
 
