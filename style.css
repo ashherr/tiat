@@ -121,7 +121,7 @@ td:last-child {
     max-width: 80%;
     max-height: 80vh;
     object-fit: contain;
-    opacity: .1;
+    opacity: 1;
 }
 
 h1, h2, p, td {
