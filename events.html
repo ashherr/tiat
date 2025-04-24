@@ -211,11 +211,16 @@
       
       document.addEventListener('DOMContentLoaded', async () => {
         // Initialize Supabase client
-        const supabaseUrl = 'YOUR_SUPABASE_URL';
-        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+        // Make sure to include the complete URL with https:// prefix
+        const supabaseUrl = 'https://ginzmsygxtxhlozcqvdj.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpbnptc3lneHR4aGxvemNxdmRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1MzM2ODcsImV4cCI6MjA2MTEwOTY4N30.-j-ssfwZqcuWTIsqLoCjg6FbO9tCx5jYeZS3whGOBec';
         
         try {
+          // Create Supabase client
           const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+          
+          // Test connection
+          console.log('Attempting to connect to Supabase...');
           
           // DOM elements
           const eventsContainer = document.getElementById('events-container');
