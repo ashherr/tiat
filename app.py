@@ -1,17 +1,22 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
 from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
 
+# Initialize Flask app
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///events.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Initialize database
 db = SQLAlchemy(app)
 
+# Models
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
@@ -20,9 +25,10 @@ class Event(db.Model):
     description = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String(500), nullable=False)
     event_link = db.Column(db.String(500), nullable=False)
-    tags = db.Column(db.String(500), nullable=False)  # Stored as comma-separated values
+    tags = db.Column(db.String(500), nullable=False)
     is_starred = db.Column(db.Boolean, default=False)
 
+# Routes
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -33,7 +39,7 @@ def salons():
 
 @app.route('/salon')
 def salon():
-    return redirect(url_for('salons'))  # Redirect /salon to /salons
+    return redirect(url_for('salons'))
 
 @app.route('/submit', methods=['GET', 'POST'])
 def submit_event():
@@ -59,6 +65,7 @@ def get_events():
     if tag:
         query = query.filter(Event.tags.contains(tag))
     events = query.order_by(Event.start_time).all()
+    
     return jsonify([{
         'id': event.id,
         'title': event.title,
@@ -71,12 +78,18 @@ def get_events():
         'is_starred': event.is_starred
     } for event in events])
 
-# Serve static files from the root directory if needed
+# Redirect for static files
 @app.route('/salons.html')
 def salons_static():
     return redirect(url_for('salons'))
 
+@app.route('/submit.html')
+def submit_static():
+    return redirect(url_for('submit_event'))
+
+# For Vercel deployment
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True) 
+    app.run(debug=False) 
+
