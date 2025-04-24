@@ -31,6 +31,10 @@ def index():
 def salons():
     return render_template('salons.html')
 
+@app.route('/salon')
+def salon():
+    return redirect(url_for('salons'))  # Redirect /salon to /salons
+
 @app.route('/submit', methods=['GET', 'POST'])
 def submit_event():
     if request.method == 'POST':
