@@ -179,7 +179,7 @@ def get_events():
             }
             
             if tag:
-                # Filter by tag
+                # Filter by tag - use cs (contains) for comma-separated values
                 query_params["tags"] = f"cs.{tag}"
                 
             events_data = supabase_select("events", query_params)
@@ -199,9 +199,18 @@ def get_events():
         else:
             # Use SQLAlchemy in development
             query = Event.query.filter(Event.start_time >= datetime.now())
+            
             if tag:
-                query = query.filter(Event.tags.contains(tag))
+                # Ensure proper tag filtering for SQLite
+                # For comma-separated tags, we need to use LIKE with wildcards
+                tag_pattern = f"%{tag}%"
+                query = query.filter(Event.tags.like(tag_pattern))
+                
             events = query.order_by(Event.start_time).all()
+            
+            # Log the SQL query for debugging
+            print(f"SQL Query: {str(query)}")
+            print(f"Events found: {len(events)}")
             
             return jsonify([{
                 'id': event.id,
