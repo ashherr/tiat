@@ -123,14 +123,18 @@
             if (tag) {
                 url += `?tag=${tag}`;
             }
+            console.log(`Fetching events from ${url}`);
+            
             fetch(url)
                 .then(response => {
+                    console.log(`Response status: ${response.status}`);
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     return response.json();
                 })
                 .then(events => {
+                    console.log(`Received events:`, events);
                     // Make sure events is always an array
                     if (!Array.isArray(events)) {
                         console.error('API response is not an array:', events);
@@ -218,7 +222,19 @@
                 .catch(error => {
                     console.error('Error fetching events:', error);
                     const eventsDiv = document.getElementById('events');
-                    eventsDiv.innerHTML = `<p style="margin-left: 20px">Error loading events: ${error.message}</p>`;
+                    
+                    // Check if there's a JSON error in the response
+                    if (error.message.includes("JSON")) {
+                        eventsDiv.innerHTML = `
+                            <p style="margin-left: 20px">Error parsing response: ${error.message}</p>
+                            <p style="margin-left: 20px">This may be caused by an invalid response from the server.</p>
+                        `;
+                    } else {
+                        eventsDiv.innerHTML = `
+                            <p style="margin-left: 20px">Error loading events: ${error.message}</p>
+                            <p style="margin-left: 20px">Please try again later or contact support.</p>
+                        `;
+                    }
                 });
         }
 

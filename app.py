@@ -29,9 +29,9 @@ if is_production:
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     print(f"Environment: Production (Using Supabase REST API)")
 else:
-    # Use SQLite for local development
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///events.db'
-    print("Environment: Development (SQLite)")
+    # Use SQLite for local development with explicit path to the database
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/events.db'
+    print(f"Environment: Development (SQLite - Database Path: {app.config['SQLALCHEMY_DATABASE_URI']})")
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
