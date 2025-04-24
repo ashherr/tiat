@@ -16,17 +16,43 @@ CALENDAR_ID = os.getenv('GOOGLE_CALENDAR_ID', 'primary')  # Calendar ID to add e
 def create_service():
     """Create a Google Calendar API service."""
     try:
-        # Check if credentials file exists
-        if not os.path.exists(CREDENTIALS_FILE):
-            print(f"Credentials file not found: {CREDENTIALS_FILE}")
+        # First try to use environment variables (more secure)
+        client_id = os.getenv('GOOGLE_CLIENT_ID')
+        client_secret = os.getenv('GOOGLE_CLIENT_SECRET')
+        
+        if client_id and client_secret:
+            print("Using Google credentials from environment variables")
+            
+            # Create a dictionary similar to service account JSON
+            credentials_info = {
+                "web": {
+                    "client_id": client_id,
+                    "project_id": os.getenv('GOOGLE_PROJECT_ID', ''),
+                    "auth_uri": os.getenv('GOOGLE_AUTH_URI', 'https://accounts.google.com/o/oauth2/auth'),
+                    "token_uri": os.getenv('GOOGLE_TOKEN_URI', 'https://oauth2.googleapis.com/token'),
+                    "auth_provider_x509_cert_url": os.getenv('GOOGLE_AUTH_PROVIDER_X509_CERT_URL', 
+                                                          'https://www.googleapis.com/oauth2/v1/certs'),
+                    "client_secret": client_secret
+                }
+            }
+            
+            # Create credentials from dictionary
+            credentials = service_account.Credentials.from_service_account_info(
+                credentials_info,
+                scopes=['https://www.googleapis.com/auth/calendar']
+            )
+        
+        # Fall back to file-based credentials if environment variables not set
+        elif os.path.exists(CREDENTIALS_FILE):
+            print(f"Using Google credentials from file: {CREDENTIALS_FILE}")
+            credentials = service_account.Credentials.from_service_account_file(
+                CREDENTIALS_FILE, 
+                scopes=['https://www.googleapis.com/auth/calendar']
+            )
+        else:
+            print(f"No Google credentials available (neither environment variables nor file found)")
             return None
             
-        # Create credentials using service account
-        credentials = service_account.Credentials.from_service_account_file(
-            CREDENTIALS_FILE, 
-            scopes=['https://www.googleapis.com/auth/calendar']
-        )
-        
         # Build the service
         service = build('calendar', 'v3', credentials=credentials)
         return service
