@@ -8,8 +8,16 @@
     ],
     "routes": [
       {
+        "src": "/status",
+        "dest": "/api/status.py"
+      },
+      {
+        "src": "/recovery",
+        "dest": "/api/recovery.py"
+      },
+      {
         "src": "/(.*)",
-        "dest": "/api/index.py"
+        "dest": "/api/flask_app.py"
       }
     ],
     "env": {
