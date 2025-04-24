@@ -1,5 +1,9 @@
-/* Cycle through a few pics per event heading */
-const eventHeadings = document.querySelectorAll('.event-heading');
+/* Control background image as user scrolls through sections */
+const sections = document.querySelectorAll('section');
+const backgroundImage = document.getElementById('background-image');
+
+// Set initial opacity for background image
+backgroundImage.style.opacity = '0.3';  // 30% opacity (70% transparent)
 
 const imageUrlsByHeading = {
   "Demos from event 1": [
@@ -50,29 +54,61 @@ const imageUrlsByHeading = {
   ],
 };
 
-eventHeadings.forEach((eventHeading) => {
-  const eventImage = eventHeading.querySelector('.event-image');
-  const heading = eventHeading.getAttribute('data-heading');
-  const imageUrls = imageUrlsByHeading[heading];
+// Track currently visible section and image cycling
+let currentVisibleSection = null;
+let cycleIntervalId = null;
+let currentImageIndex = 0;
 
-  let currentIndex = 0;
-  let intervalId;
+// Intersection Observer to detect when sections are in view
+const observerOptions = {
+  root: null,
+  rootMargin: '0px',
+  threshold: 0.5 // At least 50% of the section visible to trigger
+};
 
-  eventHeading.addEventListener('mouseover', () => {
-    eventImage.style.display = 'block';
-    intervalId = setInterval(cycleImages, 500); // Change image every 1 second (adjust the interval as needed)
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    const section = entry.target;
+    const eventHeading = section.querySelector('.event-heading');
+    if (!eventHeading) return;
+    
+    const heading = eventHeading.getAttribute('data-heading');
+    const imageUrls = imageUrlsByHeading[heading];
+    
+    if (!imageUrls) return;
+    
+    if (entry.isIntersecting) {
+      // Stop any existing image cycling
+      if (cycleIntervalId) {
+        clearInterval(cycleIntervalId);
+      }
+      
+      // Update current visible section
+      currentVisibleSection = section;
+      currentImageIndex = 0;
+      
+      // Set initial image
+      backgroundImage.src = imageUrls[0];
+      backgroundImage.style.opacity = '0.3';  // 30% opacity
+      
+      // Start cycling images without fade transition
+      cycleIntervalId = setInterval(() => {
+        currentImageIndex = (currentImageIndex + 1) % imageUrls.length;
+        backgroundImage.src = imageUrls[currentImageIndex];
+        backgroundImage.style.opacity = '0.3';  // Keep opacity consistent
+      }, 3000);
+    } else if (section === currentVisibleSection && !entry.isIntersecting) {
+      // If the current section is no longer visible
+      if (cycleIntervalId) {
+        clearInterval(cycleIntervalId);
+        cycleIntervalId = null;
+      }
+      currentVisibleSection = null;
+    }
   });
+}, observerOptions);
 
-  eventHeading.addEventListener('mouseout', () => {
-    eventImage.style.display = 'none';
-    clearInterval(intervalId); // Stop the image cycling
-  });
-
-  function cycleImages() {
-    eventImage.src = imageUrls[currentIndex];
-    currentIndex = (currentIndex + 1) % imageUrls.length;
-  }
-
-  // Set initial image
-  eventImage.src = imageUrls[0];
+// Start observing each section
+sections.forEach(section => {
+  observer.observe(section);
 });

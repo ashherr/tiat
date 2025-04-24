@@ -1,4 +1,3 @@
-
 *{
     font-family: 'Kosugi', sans-serif;
 }
@@ -8,10 +7,16 @@ body {
     display: flex;
     justify-content: center;
     margin: 32px 0;
+    position: relative;
 }
 
 main {
     position: relative;
+    width: 100%;
+    max-width: 600px;
+    background-color: transparent;
+    z-index: 2;
+    padding: 2rem;
 }
 
 .header-image {
@@ -20,18 +25,18 @@ main {
 }
 
 .event-image {
-    max-width: 600px;   
+    display: block;
+    max-width: 300px;
+    max-height: 300px;
+    object-fit: contain;
+    margin: 0 auto 2rem auto;
+    z-index: 10;
+    border-radius: 4px;
 }
 
 .header {
     display: grid;
     grid-template-columns: auto 1fr;
-}
-
-
-main {
-    width: 100%;
-    max-width: 600px;
 }
 
 h2 {
@@ -49,9 +54,17 @@ h2:after {
 
 table {
     width: 100%;
+    position: relative;
+    z-index: 2;
+    background-color: transparent;
 }
+
 section {
     position: relative;
+    margin-bottom: 4rem;
+    background-color: transparent;
+    padding: 1.5rem;
+    z-index: 2;
 }
 
 td:last-child {
@@ -61,8 +74,7 @@ td:last-child {
 
 /* Produces images on hover for each event heading */
 .image-container {
-  position: relative;
-  text-align: center;
+    display: none; /* Hide the old image containers */
 }
 
 .event-heading, &:visited {
@@ -75,29 +87,45 @@ td:last-child {
     color: blue;
     text-decoration-color: blue;
     transition: 160ms linear all;
-}
-
-.event-image {
-  position: absolute;
-  display: none;
-  left: 1em;
-  bottom: -10em;
-  width: auto;
-  height: auto;
-  
+    z-index: 10;
 }
 
 /* No horizontal overflow on mobile */
-@media (max-width: 600px) {
-    main {
-        padding: 0 16px;
-    }
-
+@media (max-width: 768px) {
     .event-image {
-        bottom: 4rem;
-        left: 0;
-        right: 0;
-        margin: auto;
-        width: 100%;
+        max-width: 100%;
+        margin: 1rem auto;
     }
+    
+    .image-container {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+}
+
+.background-image-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.background-image {
+    max-width: 80%;
+    max-height: 80vh;
+    object-fit: contain;
+    opacity: .1;
+}
+
+h1, h2, p, td {
+    position: relative;
+    z-index: 5;
+    background-color: transparent;
 }
