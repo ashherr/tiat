@@ -64,8 +64,29 @@
     }
     
     .preview img {
-        max-width: 100% !important;
+        max-width: 90% !important;
         height: auto !important;
+        margin: 0 auto !important;
+    }
+    
+    /* Make images in any context smaller on mobile */
+    img {
+        max-width: 85% !important;
+        height: auto !important;
+        margin: 0 auto !important;
+        display: block !important;
+    }
+    
+    /* Specific adjustments for salon page images */
+    .event-image {
+        max-width: 85% !important;
+        height: auto !important;
+        margin: 0 auto !important;
+    }
+    
+    .image-container {
+        text-align: center !important;
+        padding: 10px 0 !important;
     }
     
     /* Form elements for submit page */
@@ -145,6 +166,11 @@
     /* Better preview on very small screens */
     .preview {
         padding: 15px !important;
+    }
+    
+    /* Make images even smaller on very small screens */
+    img, .event-image, .preview img {
+        max-width: 80% !important;
     }
     
     /* Only adjust salon page table layout on very small screens */

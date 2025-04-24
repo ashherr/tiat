@@ -121,7 +121,9 @@
         function loadEvents(tag = null) {
             let url = '/api/events';
             if (tag) {
-                url += `?tag=${tag}`;
+                // Properly encode tag for URL
+                const encodedTag = encodeURIComponent(tag);
+                url += `?tag=${encodedTag}`;
             }
             console.log(`Fetching events from ${url}`);
             
@@ -248,9 +250,23 @@
             if (tag === null) {
                 document.getElementById('tag-all').classList.add('tag-active');
             } else {
-                // Convert tag to the same format as the id
-                const tagId = 'tag-' + tag.toLowerCase().replace(' / ', '-').replace(' ', '-');
-                document.getElementById(tagId).classList.add('tag-active');
+                // Convert tag to the same format as the id, handling special chars
+                const tagIdSafe = tag.toLowerCase()
+                    .replace(' / ', '-')
+                    .replace('/', '-')
+                    .replace(' ', '-');
+                const tagId = 'tag-' + tagIdSafe;
+                
+                try {
+                    const tagElement = document.getElementById(tagId);
+                    if (tagElement) {
+                        tagElement.classList.add('tag-active');
+                    } else {
+                        console.error(`Tag element with ID "${tagId}" not found`);
+                    }
+                } catch (e) {
+                    console.error(`Error highlighting tag: ${e.message}`);
+                }
             }
             
             loadEvents(tag);

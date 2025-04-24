@@ -111,12 +111,12 @@ document.addEventListener('DOMContentLoaded', function() {
     styleElement.textContent = `
         .image-container {
             display: none;
-            margin: 10px 0;
+            margin: 15px 0;
             text-align: center;
         }
         
         .event-image {
-            max-width: 100%;
+            max-width: 90%;
             height: auto;
             display: block;
             margin: 0 auto;
@@ -126,6 +126,20 @@ document.addEventListener('DOMContentLoaded', function() {
         .event-heading:hover .image-container,
         .event-heading:hover .event-image {
             display: none;
+        }
+        
+        /* Additional mobile-specific styles */
+        @media screen and (max-width: 768px) {
+            .event-image {
+                max-width: 85%;
+            }
+        }
+        
+        /* Extra small devices */
+        @media screen and (max-width: 480px) {
+            .event-image {
+                max-width: 80%;
+            }
         }
     `;
     document.head.appendChild(styleElement);
