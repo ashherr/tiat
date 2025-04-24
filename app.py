@@ -136,13 +136,21 @@ def salon():
 
 @app.route('/calendar')
 def calendar():
-    calendar_info = gcal_integration.get_calendar_info()
-    
-    return render_template('calendar.html',
-                          calendar_id=calendar_info['calendar_id'],
-                          google_url=calendar_info['html_link'],
-                          ical_url=calendar_info['ical_url'],
-                          embed_html=calendar_info['embed_html'])
+    """Show calendar subscription information."""
+    try:
+        calendar_info = gcal_integration.get_calendar_info()
+        
+        return render_template('calendar.html',
+                            calendar_id=calendar_info['calendar_id'],
+                            google_url=calendar_info['html_link'],
+                            ical_url=calendar_info['ical_url'],
+                            embed_html=calendar_info['embed_html'])
+    except Exception as e:
+        print(f"Error loading calendar info: {str(e)}")
+        # Return an error page instead of crashing
+        return render_template('error.html', 
+                              error="Calendar integration is currently unavailable", 
+                              description="Please try again later or contact the administrator.")
 
 @app.route('/submit', methods=['GET', 'POST'])
 def submit_event():
@@ -183,9 +191,9 @@ def submit_event():
                         print(f"Event added to Google Calendar with ID: {calendar_event_id}")
                     else:
                         print("Failed to add event to Google Calendar")
-                except Exception as gcal_error:
-                    print(f"Google Calendar error: {str(gcal_error)}")
-                    # Continue with database insertion even if calendar fails
+                except Exception as cal_error:
+                    print(f"Error adding to Google Calendar: {str(cal_error)}")
+                    # Continue with submission even if calendar fails
             
             if is_production:
                 # Use Supabase REST API in production
