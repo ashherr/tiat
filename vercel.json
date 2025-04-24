@@ -11,5 +11,13 @@
         "src": "/(.*)",
         "dest": "/app.py"
       }
-    ]
-  }
+    ],
+    "env": {
+      "VERCEL": "1"
+    },
+    "build": {
+      "env": {
+        "PIP_EXTRA_INDEX_URL": ""
+      }
+    }
+}

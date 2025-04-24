@@ -10,7 +10,29 @@ load_dotenv()
 # Initialize Flask app
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///events.db'
+
+# Determine if we're in production (Vercel deployment)
+is_production = os.environ.get('VERCEL', False)
+
+# Set the database URI based on environment
+if is_production:
+    # For Vercel deployment with Supabase PostgreSQL
+    # The database connection will be configured via environment variables in Vercel
+    # Format: postgresql://username:password@host:port/database
+    # We'll create a direct PostgreSQL connection string for Supabase
+    db_user = "postgres"
+    db_password = os.getenv('SUPABASE_KEY', '')
+    db_host = "db." + os.getenv('SUPABASE_URL', '').replace('https://', '')
+    db_port = "5432"
+    db_name = "postgres"
+    
+    # Construct the PostgreSQL connection string
+    db_url = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+else:
+    # Use SQLite for local development
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///events.db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database
@@ -44,18 +66,24 @@ def salon():
 @app.route('/submit', methods=['GET', 'POST'])
 def submit_event():
     if request.method == 'POST':
-        event = Event(
-            title=request.form['title'],
-            start_time=datetime.strptime(request.form['start_time'], '%Y-%m-%dT%H:%M'),
-            location=request.form['location'],
-            description=request.form['description'],
-            image_url=request.form['image_url'],
-            event_link=request.form['event_link'],
-            tags=','.join(request.form.getlist('tags'))
-        )
-        db.session.add(event)
-        db.session.commit()
-        return redirect(url_for('index'))
+        try:
+            event = Event(
+                title=request.form['title'],
+                start_time=datetime.strptime(request.form['start_time'], '%Y-%m-%dT%H:%M'),
+                location=request.form['location'],
+                description=request.form['description'],
+                image_url=request.form['image_url'],
+                event_link=request.form['event_link'],
+                tags=','.join(request.form.getlist('tags'))
+            )
+            db.session.add(event)
+            db.session.commit()
+            return redirect(url_for('index'))
+        except Exception as e:
+            # Log the error (in production this would go to your logging system)
+            print(f"Error submitting event: {str(e)}")
+            # Return a more helpful error page
+            return render_template('error.html', error=str(e)), 500
     return render_template('submit.html')
 
 @app.route('/api/events')
