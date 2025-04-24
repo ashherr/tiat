@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
+import traceback
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -14,25 +15,29 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key')
 # Determine if we're in production (Vercel deployment)
 is_production = os.environ.get('VERCEL', False)
 
+# Get Supabase info for both db connection and diagnostics
+supabase_url = os.getenv('SUPABASE_URL', '')
+project_id = supabase_url.replace('https://', '').split('.')[0] if supabase_url else ''
+
 # Set the database URI based on environment
 if is_production:
     # For Vercel deployment with Supabase PostgreSQL
-    # The direct connection string approach wasn't working due to socket issues
-    # Instead, use a connection string that works with Vercel and Supabase
-    supabase_url = os.getenv('SUPABASE_URL', '').replace('https://', '')
+    # Use direct connection to the Supabase PostgreSQL database
     db_password = os.getenv('SUPABASE_KEY', '')
     
-    # Connection string format for Supabase from Vercel
-    # Use the hostname without db. prefix to avoid socket address family issues
-    # Separate the project ID from the hostname
-    project_id = supabase_url.split('.')[0]
-    
-    # PostgreSQL connection string for Supabase
-    db_url = f"postgresql://postgres:{db_password}@aws-0-{os.getenv('VERCEL_REGION', 'us-east-1')}.pooler.supabase.com:5432/postgres"
+    # Construct PostgreSQL connection string for Supabase
+    # Format: postgresql://postgres:[PASSWORD]@db.[PROJECT_ID].supabase.co:5432/postgres
+    db_url = f"postgresql://postgres:{db_password}@db.{project_id}.supabase.co:5432/postgres"
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+    
+    # Log connection info (without password) for debugging
+    print(f"Connecting to Supabase PostgreSQL: db.{project_id}.supabase.co:5432/postgres")
+    print(f"Project ID: {project_id}")
+    print(f"Environment: Production")
 else:
     # Use SQLite for local development
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///events.db'
+    print("Environment: Development (SQLite)")
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -81,31 +86,67 @@ def submit_event():
             db.session.commit()
             return redirect(url_for('index'))
         except Exception as e:
-            # Log the error (in production this would go to your logging system)
-            print(f"Error submitting event: {str(e)}")
+            # Log the error with traceback for better debugging
+            error_traceback = traceback.format_exc()
+            print(f"Error submitting event: {str(e)}\n{error_traceback}")
+            
             # Return a more helpful error page
-            return render_template('error.html', error=str(e)), 500
+            return render_template('error.html', error=f"{str(e)}\n\nTraceback:\n{error_traceback}"), 500
     return render_template('submit.html')
 
 @app.route('/api/events')
 def get_events():
     tag = request.args.get('tag')
-    query = Event.query.filter(Event.start_time >= datetime.now())
-    if tag:
-        query = query.filter(Event.tags.contains(tag))
-    events = query.order_by(Event.start_time).all()
-    
-    return jsonify([{
-        'id': event.id,
-        'title': event.title,
-        'start_time': event.start_time.isoformat(),
-        'location': event.location,
-        'description': event.description,
-        'image_url': event.image_url,
-        'event_link': event.event_link,
-        'tags': event.tags.split(',') if event.tags else [],
-        'is_starred': event.is_starred
-    } for event in events])
+    try:
+        query = Event.query.filter(Event.start_time >= datetime.now())
+        if tag:
+            query = query.filter(Event.tags.contains(tag))
+        events = query.order_by(Event.start_time).all()
+        
+        return jsonify([{
+            'id': event.id,
+            'title': event.title,
+            'start_time': event.start_time.isoformat(),
+            'location': event.location,
+            'description': event.description,
+            'image_url': event.image_url,
+            'event_link': event.event_link,
+            'tags': event.tags.split(',') if event.tags else [],
+            'is_starred': event.is_starred
+        } for event in events])
+    except Exception as e:
+        error_traceback = traceback.format_exc()
+        print(f"Error fetching events: {str(e)}\n{error_traceback}")
+        return jsonify({"error": str(e), "traceback": error_traceback}), 500
+
+# Add a diagnostic route to check database connection
+@app.route('/db-test')
+def db_test():
+    try:
+        # Try to make a simple query to test the database connection
+        db.session.execute("SELECT 1").fetchone()
+        return jsonify({
+            "status": "success", 
+            "message": "Database connection successful",
+            "config": {
+                "db_host": f"db.{project_id}.supabase.co" if is_production else "sqlite",
+                "is_production": is_production,
+                "project_id": project_id
+            }
+        })
+    except Exception as e:
+        error_traceback = traceback.format_exc()
+        print(f"Database connection error: {str(e)}\n{error_traceback}")
+        return jsonify({
+            "status": "error", 
+            "message": str(e),
+            "traceback": error_traceback,
+            "config": {
+                "db_host": f"db.{project_id}.supabase.co" if is_production else "sqlite",
+                "is_production": is_production,
+                "project_id": project_id
+            }
+        }), 500
 
 # Redirect for static files
 @app.route('/salons.html')
