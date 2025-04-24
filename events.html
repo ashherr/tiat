@@ -65,6 +65,7 @@
         margin-top: 20px;
         padding: 20px;
         border: 1px solid #eee;
+        background: white;
       }
       #event-form div {
         margin-bottom: 10px;
@@ -74,12 +75,29 @@
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 8px;
       }
+      .visible {
+        display: block !important;
+      }
+      .submit-button {
+        margin-top: 10px;
+        padding: 8px 16px;
+        background-color: #f0f0f0;
+        border: none;
+        cursor: pointer;
+      }
+      .btn {
+        padding: 8px 16px;
+        margin-right: 10px;
+        background-color: #f0f0f0;
+        border: none;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
     <h1>events | <a href="index.html">tiat.place</a></h1>
     
-    <a href="#" id="submit-event">submit an event</a>
+    <button id="submit-event" class="submit-button">submit an event</button>
     
     <div id="tags-container">
       <span class="tag active" data-tag="all">all</span>
@@ -148,259 +166,268 @@
             <label><input type="checkbox" name="tags" value="fabrication"> fabrication</label>
           </div>
         </div>
-        <button type="submit">Submit Event</button>
-        <button type="button" id="cancel-submission">Cancel</button>
+        <button type="submit" class="btn">Submit Event</button>
+        <button type="button" id="cancel-submission" class="btn">Cancel</button>
       </form>
     </div>
 
     <script>
+      // Get DOM elements for form toggle
+      const submitButton = document.getElementById('submit-event');
+      const submissionForm = document.getElementById('submission-form');
+      const cancelButton = document.getElementById('cancel-submission');
+      const eventForm = document.getElementById('event-form');
+      
+      // Toggle submission form display
+      submitButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        submissionForm.style.display = 'block';
+      });
+      
+      cancelButton.addEventListener('click', function() {
+        submissionForm.style.display = 'none';
+        eventForm.reset();
+      });
+      
       document.addEventListener('DOMContentLoaded', async () => {
         // Initialize Supabase client
-        const supabaseUrl = 'YOUR_SUPABASE_URL';
-        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const supabaseUrl = 'https://ginzmsygxtxhlozcqvdj.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpbnptc3lneHR4aGxvemNxdmRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1MzM2ODcsImV4cCI6MjA2MTEwOTY4N30.-j-ssfwZqcuWTIsqLoCjg6FbO9tCx5jYeZS3whGOBec';
         
-        // DOM elements
-        const eventsContainer = document.getElementById('events-container');
-        const tagsContainer = document.getElementById('tags-container');
-        const submitButton = document.getElementById('submit-event');
-        const submissionForm = document.getElementById('submission-form');
-        const eventForm = document.getElementById('event-form');
-        const cancelButton = document.getElementById('cancel-submission');
-        
-        // Initialize
         try {
-          await loadAndDisplayEvents();
-          setupTagFiltering();
-          setupEventForm();
-        } catch (error) {
-          console.error("Initialization error:", error);
-          eventsContainer.innerHTML = `<div class="error">Error initializing: ${error.message}</div>`;
-        }
-        
-        // Event listeners
-        submitButton.addEventListener('click', (e) => {
-          e.preventDefault();
-          submissionForm.style.display = 'block';
-        });
-        
-        cancelButton.addEventListener('click', () => {
-          submissionForm.style.display = 'none';
-          eventForm.reset();
-        });
-        
-        // Functions
-        async function loadAndDisplayEvents(filterTag = 'all') {
-          // Show loading
-          eventsContainer.innerHTML = '<div class="loading">Loading events...</div>';
+          const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
           
+          // DOM elements
+          const eventsContainer = document.getElementById('events-container');
+          const tagsContainer = document.getElementById('tags-container');
+          
+          // Initialize
           try {
-            // Get current date (starting from today)
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const todayISO = today.toISOString().split('T')[0];
-            
-            // Query events from Supabase
-            let query = supabase
-              .from('events')
-              .select('*')
-              .gte('date', todayISO)
-              .order('date', { ascending: true })
-              .order('start_time', { ascending: true });
-            
-            // Apply tag filter if needed
-            if (filterTag !== 'all') {
-              query = query.contains('tags', [filterTag]);
-            }
-            
-            const { data: events, error } = await query;
-            
-            if (error) throw error;
-            
-            // Clear events container
-            eventsContainer.innerHTML = '';
-            
-            // No events
-            if (!events || events.length === 0) {
-              eventsContainer.innerHTML = '<p>No upcoming events. Be the first to submit one!</p>';
-              return;
-            }
-            
-            // Group events by date
-            const eventsByDate = groupEventsByDate(events);
-            
-            // Create DOM elements for each date and its events
-            Object.keys(eventsByDate).forEach(date => {
-              // Format date for display
-              const dateObj = new Date(date);
-              const formattedDate = dateObj.toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                month: 'long', 
-                day: 'numeric' 
-              });
-              
-              // Create date heading
-              const dateElement = document.createElement('div');
-              dateElement.className = 'date';
-              dateElement.textContent = formattedDate;
-              eventsContainer.appendChild(dateElement);
-              
-              // Create event elements
-              eventsByDate[date].forEach(event => {
-                // Format times
-                const startTime = formatTime(event.start_time);
-                const endTime = formatTime(event.end_time);
-                
-                // Create event element
-                const eventElement = document.createElement('div');
-                eventElement.className = 'event';
-                eventElement.setAttribute('data-id', event.id);
-                
-                // Star for featured events (keeping this in case you want to add it back later)
-                const featuredStar = event.is_featured ? '★ ' : '';
-                
-                // Event text: time, title, location
-                eventElement.textContent = `${featuredStar}${startTime}-${endTime} ${event.name} @ ${event.location}`;
-                
-                // Create image element (hidden by default)
-                if (event.image_url) {
-                  const imageElement = document.createElement('img');
-                  imageElement.className = 'event-image';
-                  imageElement.src = event.image_url;
-                  imageElement.alt = event.name;
-                  imageElement.loading = 'lazy'; // Add lazy loading for better performance
-                  eventElement.appendChild(imageElement);
-                }
-                
-                // Create description element (hidden by default)
-                const descriptionElement = document.createElement('div');
-                descriptionElement.className = 'event-description';
-                descriptionElement.textContent = event.description;
-                
-                // Add tags to description
-                if (event.tags && event.tags.length > 0) {
-                  const tagsText = document.createElement('div');
-                  tagsText.textContent = `Tags: ${event.tags.join(', ')}`;
-                  descriptionElement.appendChild(tagsText);
-                }
-                
-                eventElement.appendChild(descriptionElement);
-                
-                // Event hover effects
-                eventElement.addEventListener('mouseenter', () => {
-                  const image = eventElement.querySelector('.event-image');
-                  if (image) image.style.display = 'block';
-                  eventElement.querySelector('.event-description').style.display = 'block';
-                });
-                
-                eventElement.addEventListener('mouseleave', () => {
-                  const image = eventElement.querySelector('.event-image');
-                  if (image) image.style.display = 'none';
-                  eventElement.querySelector('.event-description').style.display = 'none';
-                });
-                
-                eventsContainer.appendChild(eventElement);
-              });
-            });
+            await loadAndDisplayEvents();
+            setupTagFiltering();
+            setupEventForm();
           } catch (error) {
-            console.error('Error loading events:', error);
-            eventsContainer.innerHTML = `<div class="error">Error loading events: ${error.message}</div>`;
+            console.error("Initialization error:", error);
+            eventsContainer.innerHTML = `<div class="error">Error initializing: ${error.message}</div>`;
           }
-        }
-        
-        function setupTagFiltering() {
-          const tags = tagsContainer.querySelectorAll('.tag');
           
-          tags.forEach(tag => {
-            tag.addEventListener('click', () => {
-              // Remove active class from all tags
-              tags.forEach(t => t.classList.remove('active'));
-              
-              // Add active class to clicked tag
-              tag.classList.add('active');
-              
-              // Get the tag value and filter events
-              const tagValue = tag.getAttribute('data-tag');
-              loadAndDisplayEvents(tagValue);
-            });
-          });
-        }
-        
-        function setupEventForm() {
-          eventForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            // Get form values
-            const name = document.getElementById('event-name').value;
-            const date = document.getElementById('event-date').value;
-            const startTime = document.getElementById('event-time').value;
-            const endTime = document.getElementById('event-end-time').value;
-            const location = document.getElementById('event-location').value;
-            const description = document.getElementById('event-description').value;
-            const imageUrl = document.getElementById('event-image').value;
-            
-            // Get selected tags
-            const selectedTags = [];
-            document.querySelectorAll('input[name="tags"]:checked').forEach(checkbox => {
-              selectedTags.push(checkbox.value);
-            });
-            
-            // Create event object
-            const newEvent = {
-              name,
-              date,
-              start_time: startTime,
-              end_time: endTime,
-              location,
-              description,
-              image_url: imageUrl,
-              tags: selectedTags,
-              is_featured: false,
-              created_at: new Date().toISOString()
-            };
+          // Functions
+          async function loadAndDisplayEvents(filterTag = 'all') {
+            // Show loading
+            eventsContainer.innerHTML = '<div class="loading">Loading events...</div>';
             
             try {
-              // Save to Supabase
-              const { data, error } = await supabase
+              // Get current date (starting from today)
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              const todayISO = today.toISOString().split('T')[0];
+              
+              // Query events from Supabase
+              let query = supabase
                 .from('events')
-                .insert([newEvent]);
+                .select('*')
+                .gte('date', todayISO)
+                .order('date', { ascending: true })
+                .order('start_time', { ascending: true });
+              
+              // Apply tag filter if needed
+              if (filterTag !== 'all') {
+                query = query.contains('tags', [filterTag]);
+              }
+              
+              const { data: events, error } = await query;
               
               if (error) throw error;
               
-              // Reset form and hide
-              eventForm.reset();
-              submissionForm.style.display = 'none';
+              // Clear events container
+              eventsContainer.innerHTML = '';
               
-              // Reload events
-              await loadAndDisplayEvents();
+              // No events
+              if (!events || events.length === 0) {
+                eventsContainer.innerHTML = '<p>No upcoming events. Be the first to submit one!</p>';
+                return;
+              }
               
-              alert('Event submitted successfully!');
+              // Group events by date
+              const eventsByDate = groupEventsByDate(events);
+              
+              // Create DOM elements for each date and its events
+              Object.keys(eventsByDate).forEach(date => {
+                // Format date for display
+                const dateObj = new Date(date);
+                const formattedDate = dateObj.toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  month: 'long', 
+                  day: 'numeric' 
+                });
+                
+                // Create date heading
+                const dateElement = document.createElement('div');
+                dateElement.className = 'date';
+                dateElement.textContent = formattedDate;
+                eventsContainer.appendChild(dateElement);
+                
+                // Create event elements
+                eventsByDate[date].forEach(event => {
+                  // Format times
+                  const startTime = formatTime(event.start_time);
+                  const endTime = formatTime(event.end_time);
+                  
+                  // Create event element
+                  const eventElement = document.createElement('div');
+                  eventElement.className = 'event';
+                  eventElement.setAttribute('data-id', event.id);
+                  
+                  // Star for featured events (keeping this in case you want to add it back later)
+                  const featuredStar = event.is_featured ? '★ ' : '';
+                  
+                  // Event text: time, title, location
+                  eventElement.textContent = `${featuredStar}${startTime}-${endTime} ${event.name} @ ${event.location}`;
+                  
+                  // Create image element (hidden by default)
+                  if (event.image_url) {
+                    const imageElement = document.createElement('img');
+                    imageElement.className = 'event-image';
+                    imageElement.src = event.image_url;
+                    imageElement.alt = event.name;
+                    imageElement.loading = 'lazy'; // Add lazy loading for better performance
+                    eventElement.appendChild(imageElement);
+                  }
+                  
+                  // Create description element (hidden by default)
+                  const descriptionElement = document.createElement('div');
+                  descriptionElement.className = 'event-description';
+                  descriptionElement.textContent = event.description;
+                  
+                  // Add tags to description
+                  if (event.tags && event.tags.length > 0) {
+                    const tagsText = document.createElement('div');
+                    tagsText.textContent = `Tags: ${event.tags.join(', ')}`;
+                    descriptionElement.appendChild(tagsText);
+                  }
+                  
+                  eventElement.appendChild(descriptionElement);
+                  
+                  // Event hover effects
+                  eventElement.addEventListener('mouseenter', () => {
+                    const image = eventElement.querySelector('.event-image');
+                    if (image) image.style.display = 'block';
+                    eventElement.querySelector('.event-description').style.display = 'block';
+                  });
+                  
+                  eventElement.addEventListener('mouseleave', () => {
+                    const image = eventElement.querySelector('.event-image');
+                    if (image) image.style.display = 'none';
+                    eventElement.querySelector('.event-description').style.display = 'none';
+                  });
+                  
+                  eventsContainer.appendChild(eventElement);
+                });
+              });
             } catch (error) {
-              console.error('Error submitting event:', error);
-              alert(`Error submitting event: ${error.message}`);
+              console.error('Error loading events:', error);
+              eventsContainer.innerHTML = `<div class="error">Error loading events: ${error.message}</div>`;
             }
-          });
-        }
-        
-        // Helper Functions
-        function groupEventsByDate(events) {
-          return events.reduce((groups, event) => {
-            const date = event.date;
-            if (!groups[date]) {
-              groups[date] = [];
-            }
-            groups[date].push(event);
-            return groups;
-          }, {});
-        }
-        
-        function formatTime(timeString) {
-          // Convert 24h format to 12h format
-          const [hour, minute] = timeString.split(':');
-          const hourNum = parseInt(hour);
-          const period = hourNum >= 12 ? 'PM' : 'AM';
-          const hour12 = hourNum % 12 || 12;
-          return `${hour12}:${minute}${period}`;
+          }
+          
+          function setupTagFiltering() {
+            const tags = tagsContainer.querySelectorAll('.tag');
+            
+            tags.forEach(tag => {
+              tag.addEventListener('click', () => {
+                // Remove active class from all tags
+                tags.forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked tag
+                tag.classList.add('active');
+                
+                // Get the tag value and filter events
+                const tagValue = tag.getAttribute('data-tag');
+                loadAndDisplayEvents(tagValue);
+              });
+            });
+          }
+          
+          function setupEventForm() {
+            eventForm.addEventListener('submit', async (e) => {
+              e.preventDefault();
+              
+              // Get form values
+              const name = document.getElementById('event-name').value;
+              const date = document.getElementById('event-date').value;
+              const startTime = document.getElementById('event-time').value;
+              const endTime = document.getElementById('event-end-time').value;
+              const location = document.getElementById('event-location').value;
+              const description = document.getElementById('event-description').value;
+              const imageUrl = document.getElementById('event-image').value;
+              
+              // Get selected tags
+              const selectedTags = [];
+              document.querySelectorAll('input[name="tags"]:checked').forEach(checkbox => {
+                selectedTags.push(checkbox.value);
+              });
+              
+              // Create event object
+              const newEvent = {
+                name,
+                date,
+                start_time: startTime,
+                end_time: endTime,
+                location,
+                description,
+                image_url: imageUrl,
+                tags: selectedTags,
+                is_featured: false,
+                created_at: new Date().toISOString()
+              };
+              
+              try {
+                // Save to Supabase
+                const { data, error } = await supabase
+                  .from('events')
+                  .insert([newEvent]);
+                
+                if (error) throw error;
+                
+                // Reset form and hide
+                eventForm.reset();
+                submissionForm.style.display = 'none';
+                
+                // Reload events
+                await loadAndDisplayEvents();
+                
+                alert('Event submitted successfully!');
+              } catch (error) {
+                console.error('Error submitting event:', error);
+                alert(`Error submitting event: ${error.message}`);
+              }
+            });
+          }
+          
+          // Helper Functions
+          function groupEventsByDate(events) {
+            return events.reduce((groups, event) => {
+              const date = event.date;
+              if (!groups[date]) {
+                groups[date] = [];
+              }
+              groups[date].push(event);
+              return groups;
+            }, {});
+          }
+          
+          function formatTime(timeString) {
+            // Convert 24h format to 12h format
+            const [hour, minute] = timeString.split(':');
+            const hourNum = parseInt(hour);
+            const period = hourNum >= 12 ? 'PM' : 'AM';
+            const hour12 = hourNum % 12 || 12;
+            return `${hour12}:${minute}${period}`;
+          }
+        } catch (error) {
+          console.error("Error initializing Supabase:", error);
+          document.getElementById('events-container').innerHTML = 
+            `<div class="error">Error connecting to database: ${error.message}</div>`;
         }
       });
     </script>
