@@ -17,11 +17,23 @@ CREATE INDEX IF NOT EXISTS idx_events_start_time ON events (start_time);
 -- Enable Row Level Security
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
 
+-- Clear existing policies if they exist
+DROP POLICY IF EXISTS "Allow anonymous read access" ON events;
+DROP POLICY IF EXISTS "Allow authenticated insert" ON events;
+DROP POLICY IF EXISTS "Allow service role full access" ON events;
+DROP POLICY IF EXISTS "Allow anonymous insert" ON events;
+
 -- Create policy to allow anyone to read events
 CREATE POLICY "Allow anonymous read access" ON events
     FOR SELECT
     TO anon
     USING (true);
+
+-- Create policy to allow anonymous inserts (anyone can submit an event)
+CREATE POLICY "Allow anonymous insert" ON events
+    FOR INSERT
+    TO anon
+    WITH CHECK (true);
 
 -- Create policy to allow authenticated users to create events
 CREATE POLICY "Allow authenticated insert" ON events
