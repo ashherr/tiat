@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
@@ -70,6 +70,11 @@ def get_events():
         'tags': event.tags.split(',') if event.tags else [],
         'is_starred': event.is_starred
     } for event in events])
+
+# Serve static files from the root directory if needed
+@app.route('/salons.html')
+def salons_static():
+    return redirect(url_for('salons'))
 
 if __name__ == '__main__':
     with app.app_context():
