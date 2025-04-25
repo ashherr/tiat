@@ -135,6 +135,10 @@
         font-family: 'Kosugi', sans-serif;
         font-size: 12px;
       }
+      .featured-star {
+        color: #FFD700; /* Gold/Yellow color for the star */
+        font-size: 16px;
+      }
     </style>
   </head>
   <body>
@@ -377,21 +381,41 @@
                   eventElement.className = 'event';
                   eventElement.setAttribute('data-id', event.id);
                   
-                  // Star for featured events (keeping this in case you want to add it back later)
-                  const featuredStar = event.is_featured ? '★ ' : '';
+                  // Star for featured events with yellow color
+                  let featuredStar = '';
+                  if (event.is_featured) {
+                    const starSpan = document.createElement('span');
+                    starSpan.className = 'featured-star';
+                    starSpan.textContent = '★ ';
+                    featuredStar = starSpan.outerHTML;
+                  }
                   
                   // Event text: time, title, location
-                  let eventText = `${featuredStar}${startTime}-${endTime} ${event.name} @ ${event.location}`;
+                  let eventText = `${startTime}-${endTime} ${event.name} @ ${event.location}`;
                   
                   // Create event element with URL if available
                   if (event.event_url) {
                     const linkElement = document.createElement('a');
                     linkElement.href = event.event_url;
-                    linkElement.textContent = eventText;
+                    if (event.is_featured) {
+                      // Insert the star before the text for featured events
+                      const starSpan = document.createElement('span');
+                      starSpan.className = 'featured-star';
+                      starSpan.textContent = '★ ';
+                      linkElement.appendChild(starSpan);
+                      linkElement.appendChild(document.createTextNode(eventText));
+                    } else {
+                      linkElement.textContent = eventText;
+                    }
                     linkElement.target = "_blank";
                     eventElement.appendChild(linkElement);
                   } else {
-                    eventElement.textContent = eventText;
+                    if (event.is_featured) {
+                      // For featured events with no URL, use innerHTML to add the star
+                      eventElement.innerHTML = `<span class="featured-star">★ </span>${eventText}`;
+                    } else {
+                      eventElement.textContent = eventText;
+                    }
                   }
                   
                   // Create image element (hidden by default)
