@@ -3,7 +3,7 @@ const sections = document.querySelectorAll('section');
 const backgroundImage = document.getElementById('background-image');
 
 // Set initial opacity for background image
-backgroundImage.style.opacity = '0.3';  // 30% opacity (70% transparent)
+backgroundImage.style.opacity = '.5';  // 50% opacity (50% transparent)
 
 const imageUrlsByHeading = {
   "Demos from event 1": [
@@ -89,13 +89,13 @@ const observer = new IntersectionObserver((entries) => {
       
       // Set initial image
       backgroundImage.src = imageUrls[0];
-      backgroundImage.style.opacity = '0.3';  // 30% opacity
+      backgroundImage.style.opacity = '.5';  // 50% opacity
       
       // Start cycling images without fade transition
       cycleIntervalId = setInterval(() => {
         currentImageIndex = (currentImageIndex + 1) % imageUrls.length;
         backgroundImage.src = imageUrls[currentImageIndex];
-        backgroundImage.style.opacity = '0.3';  // Keep opacity consistent
+        backgroundImage.style.opacity = '.5';  // Keep opacity consistent
       }, 3000);
     } else if (section === currentVisibleSection && !entry.isIntersecting) {
       // If the current section is no longer visible
