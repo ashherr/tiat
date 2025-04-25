@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Kosugi&display=swap" rel="stylesheet">
     <!-- Supabase JS Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Google Maps Places API with error handling -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBK3OboM6-AnheCB39AoffISaiNzz5SG-Q&libraries=places" onerror="console.warn('Google Maps API failed to load. Address suggestions disabled.');" async defer></script>
     <style>
       body {
         font-family: 'Kosugi', sans-serif;
@@ -119,10 +121,24 @@
         font-size: 14px;
         margin-bottom: 15px;
       }
+      /* Style form elements to use Kosugi font */
+      input, textarea, select, button, label, small {
+        font-family: 'Kosugi', sans-serif;
+        font-size: 14px;
+      }
+      ::placeholder {
+        font-family: 'Kosugi', sans-serif;
+        font-size: 10px;
+        opacity: 0.7;
+      }
+      #submission-form small {
+        font-family: 'Kosugi', sans-serif;
+        font-size: 12px;
+      }
     </style>
   </head>
   <body>
-    <h1>events | <a href="index.html">tiat.place</a></h1>
+    <h1>sf art + tech events | <a href="index.html">tiat.place</a></h1>
     
     <button id="submit-event" class="submit-button">submit an event</button>
     
@@ -165,10 +181,12 @@
         <div>
           <label for="event-end-time">End Time:</label>
           <input type="time" id="event-end-time" required>
+          <small style="display: block; margin-top: 4px; color: #666;">Times are displayed in your local time zone.</small>
         </div>
         <div>
           <label for="event-location">Location:</label>
-          <input type="text" id="event-location" required>
+          <input type="text" id="event-location" required placeholder="Start typing for suggestions...">
+          <small style="display: block; margin-top: 4px; color: #666;">Type to search for a location</small>
         </div>
         <div>
           <label for="event-image">Image URL:</label>
@@ -185,7 +203,7 @@
         <div>
           <label>Tags (select at least one):</label>
           <div id="tag-checkboxes">
-            <label><input type="checkbox" name="tags" value="generative" required> generative</label>
+            <label><input type="checkbox" name="tags" value="generative"> generative</label>
             <label><input type="checkbox" name="tags" value="hardware"> hardware</label>
             <label><input type="checkbox" name="tags" value="internet"> internet</label>
             <label><input type="checkbox" name="tags" value="projection"> projection</label>
@@ -197,6 +215,7 @@
             <label><input type="checkbox" name="tags" value="data"> data</label>
             <label><input type="checkbox" name="tags" value="fabrication"> fabrication</label>
           </div>
+          <small style="display: block; margin-top: 4px; color: #666;">At least one tag must be selected</small>
         </div>
         <button type="submit" class="btn">Submit Event</button>
         <button type="button" id="cancel-submission" class="btn">Cancel</button>
@@ -213,12 +232,46 @@
       // Toggle submission form display
       submitButton.addEventListener('click', function() {
         submissionForm.style.display = 'block';
+        // Initialize Google Places Autocomplete when form is displayed
+        try {
+          if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+            initPlacesAutocomplete();
+          }
+        } catch (error) {
+          console.warn("Google Maps API not available. Address suggestions disabled.", error);
+        }
       });
       
       cancelButton.addEventListener('click', function() {
         submissionForm.style.display = 'none';
         eventForm.reset();
       });
+      
+      // Initialize Google Places Autocomplete
+      function initPlacesAutocomplete() {
+        try {
+          const locationInput = document.getElementById('event-location');
+          const autocomplete = new google.maps.places.Autocomplete(locationInput, {
+            types: ['establishment', 'geocode']
+          });
+          
+          // Set the data when the user selects a place
+          autocomplete.addListener('place_changed', function() {
+            const place = autocomplete.getPlace();
+            if (!place.geometry) {
+              // User entered the name of a Place that was not suggested
+              return;
+            }
+            
+            // Get the address components
+            const address = place.formatted_address;
+            locationInput.value = address;
+          });
+        } catch (error) {
+          console.warn("Error initializing Google Places Autocomplete:", error);
+          // Continue without autocomplete - form will still work
+        }
+      }
       
       document.addEventListener('DOMContentLoaded', async () => {
         // Initialize Supabase client
@@ -258,6 +311,9 @@
               today.setHours(0, 0, 0, 0);
               const todayISO = today.toISOString().split('T')[0];
               
+              console.log('Today ISO format:', todayISO);
+              console.log('Current local time:', new Date().toLocaleString());
+              
               // Query events from Supabase
               let query = supabase
                 .from('events')
@@ -275,6 +331,9 @@
               
               if (error) throw error;
               
+              // Debug: log events from database
+              console.log('Events from database:', events);
+              
               // Clear events container
               eventsContainer.innerHTML = '';
               
@@ -286,16 +345,20 @@
               
               // Group events by date
               const eventsByDate = groupEventsByDate(events);
+              console.log('Events grouped by date:', eventsByDate);
               
               // Create DOM elements for each date and its events
               Object.keys(eventsByDate).forEach(date => {
                 // Format date for display
-                const dateObj = new Date(date);
+                const dateObj = formatEventDate(date);
                 const formattedDate = dateObj.toLocaleDateString('en-US', { 
                   weekday: 'long', 
                   month: 'long', 
                   day: 'numeric' 
                 });
+                
+                console.log('Date from database:', date);
+                console.log('Formatted date for display:', formattedDate);
                 
                 // Create date heading
                 const dateElement = document.createElement('div');
@@ -305,9 +368,9 @@
                 
                 // Create event elements
                 eventsByDate[date].forEach(event => {
-                  // Format times
-                  const startTime = formatTime(event.start_time);
-                  const endTime = formatTime(event.end_time);
+                  // Format times - apply timezone adjustment if offset is available
+                  let startTime = formatTime(event.start_time);
+                  let endTime = formatTime(event.end_time);
                   
                   // Create event element
                   const eventElement = document.createElement('div');
@@ -345,13 +408,6 @@
                   const descriptionElement = document.createElement('div');
                   descriptionElement.className = 'event-description';
                   descriptionElement.textContent = event.description;
-                  
-                  // Add tags to description
-                  if (event.tags && event.tags.length > 0) {
-                    const tagsText = document.createElement('div');
-                    tagsText.textContent = `Tags: ${event.tags.join(', ')}`;
-                    descriptionElement.appendChild(tagsText);
-                  }
                   
                   eventElement.appendChild(descriptionElement);
                   
@@ -399,6 +455,13 @@
             eventForm.addEventListener('submit', async (e) => {
               e.preventDefault();
               
+              // Validate tags - at least one must be selected
+              const selectedTags = document.querySelectorAll('input[name="tags"]:checked');
+              if (selectedTags.length === 0) {
+                alert('Please select at least one tag');
+                return;
+              }
+              
               // Get form values
               const name = document.getElementById('event-name').value;
               const date = document.getElementById('event-date').value;
@@ -409,13 +472,17 @@
               const imageUrl = document.getElementById('event-image').value;
               const eventUrl = document.getElementById('event-url').value;
               
+              // Debug information
+              console.log('Submitting event with date:', date);
+              console.log('Local timezone:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+              
               // Get selected tags
-              const selectedTags = [];
-              document.querySelectorAll('input[name="tags"]:checked').forEach(checkbox => {
-                selectedTags.push(checkbox.value);
+              const selectedTagValues = [];
+              selectedTags.forEach(checkbox => {
+                selectedTagValues.push(checkbox.value);
               });
               
-              // Create event object
+              // Create event object - do not include timezone_offset as it's not in the database schema
               const newEvent = {
                 name,
                 date,
@@ -425,10 +492,13 @@
                 description,
                 image_url: imageUrl,
                 event_url: eventUrl,
-                tags: selectedTags,
+                tags: selectedTagValues,
                 is_featured: false,
                 created_at: new Date().toISOString()
               };
+              
+              // Debug: log the event object
+              console.log('Event object being sent to database:', newEvent);
               
               try {
                 // Save to Supabase
@@ -437,6 +507,9 @@
                   .insert([newEvent]);
                 
                 if (error) throw error;
+                
+                // Debug: log the returned data
+                console.log('Database response:', data);
                 
                 // Reset form and hide
                 eventForm.reset();
@@ -466,12 +539,34 @@
           }
           
           function formatTime(timeString) {
+            if (!timeString) return '';
+            
             // Convert 24h format to 12h format
             const [hour, minute] = timeString.split(':');
             const hourNum = parseInt(hour);
             const period = hourNum >= 12 ? 'PM' : 'AM';
             const hour12 = hourNum % 12 || 12;
             return `${hour12}:${minute}${period}`;
+          }
+
+          // Add explicit date converter function to ensure correct local date handling
+          function formatEventDate(dateString) {
+            // If the date is already in YYYY-MM-DD format, parse it
+            if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+              // Create date object - add 12 hours to avoid timezone issues
+              // This ensures the date is interpreted as noon local time, avoiding UTC conversion issues
+              const dateParts = dateString.split('-');
+              const year = parseInt(dateParts[0]);
+              const month = parseInt(dateParts[1]) - 1; // JavaScript months are 0-indexed
+              const day = parseInt(dateParts[2]);
+              
+              // Create a date at noon local time to avoid timezone issues
+              const dateObj = new Date(year, month, day, 12, 0, 0);
+              return dateObj;
+            }
+            
+            // Fallback to regular date parsing
+            return new Date(dateString);
           }
         } catch (error) {
           console.error("Error initializing Supabase:", error);
