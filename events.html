@@ -160,7 +160,7 @@
         font-size: 16px;
       }
       
-      /* Mobile Responsive Styles */
+      /* Add pointer cursor to event images and descriptions for mobile */
       @media (max-width: 768px) {
         body {
           padding: 15px;
@@ -179,10 +179,28 @@
         #tag-checkboxes {
           grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
         }
+        .event-image, .event-description {
+          cursor: pointer;
+        }
+        
+        /* Make descriptions look better on mobile without overlay */
         .event-description {
-          width: 85%;
-          max-height: 40%;
+          background-color: white;
+          border: 1px solid #ddd;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+          max-width: 85%;
+          max-height: 60%;
           overflow-y: auto;
+          padding: 15px;
+        }
+        
+        /* Also improve image display on mobile */
+        .event-image {
+          max-width: 85%;
+          max-height: 70%;
+          border: 1px solid #ddd;
+          background-color: white;
+          padding: 5px;
         }
       }
       
@@ -513,6 +531,55 @@
                     if (image) image.style.display = 'none';
                     eventElement.querySelector('.event-description').style.display = 'none';
                   });
+                  
+                  // For mobile: Add a tap outside listener to close event details
+                  if (event.event_url) {
+                    const eventUrl = event.event_url;
+                    
+                    // Make image clickable
+                    const image = eventElement.querySelector('.event-image');
+                    if (image) {
+                      image.addEventListener('click', (e) => {
+                        if (window.innerWidth <= 768) {
+                          e.stopPropagation();
+                          window.open(eventUrl, '_blank');
+                        }
+                      });
+                    }
+                    
+                    // Make description clickable
+                    const description = eventElement.querySelector('.event-description');
+                    if (description) {
+                      description.addEventListener('click', (e) => {
+                        if (window.innerWidth <= 768) {
+                          e.stopPropagation();
+                          window.open(eventUrl, '_blank');
+                        }
+                      });
+                    }
+                  }
+                  
+                  // For mobile: Add tap listener to close event details when tapping elsewhere
+                  if (window.innerWidth <= 768) {
+                    document.addEventListener('click', function closeEventDetails(e) {
+                      // Only if the event element is showing its details
+                      const image = eventElement.querySelector('.event-image');
+                      const description = eventElement.querySelector('.event-description');
+                      
+                      if ((image && image.style.display === 'block') || 
+                          (description && description.style.display === 'block')) {
+                        
+                        // Check if click is outside both the image and description
+                        if (!image?.contains(e.target) && !description?.contains(e.target)) {
+                          if (image) image.style.display = 'none';
+                          if (description) description.style.display = 'none';
+                          
+                          // Remove this event listener once details are closed
+                          document.removeEventListener('click', closeEventDetails);
+                        }
+                      }
+                    });
+                  }
                   
                   eventsContainer.appendChild(eventElement);
                 });
