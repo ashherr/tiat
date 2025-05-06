@@ -135,7 +135,7 @@ h1, h2, p, td {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 100vw;
     background-color: #000;
     color: #fff;
     padding: 8px 0;
@@ -146,13 +146,16 @@ h1, h2, p, td {
 
 .marquee-content {
     display: inline-block;
-    animation: marquee 20s linear infinite;
+    animation: marquee 15s linear infinite;
+    width: 100%;
+    text-align: center;
 }
 
 .marquee-content a {
     color: #fff;
     text-decoration: underline;
     margin: 0 20px;
+    font-size: 1.1em;
 }
 
 .marquee-content a:hover {
@@ -161,9 +164,9 @@ h1, h2, p, td {
 
 @keyframes marquee {
     0% {
-        transform: translateX(100%);
+        transform: translateX(100vw);
     }
     100% {
-        transform: translateX(-100%);
+        transform: translateX(-100vw);
     }
 }
