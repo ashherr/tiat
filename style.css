@@ -8,6 +8,7 @@ body {
     justify-content: center;
     margin: 32px 0;
     position: relative;
+    margin-top: 40px;
 }
 
 main {
@@ -128,4 +129,41 @@ h1, h2, p, td {
     position: relative;
     z-index: 5;
     background-color: transparent;
+}
+
+.marquee-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #000;
+    color: #fff;
+    padding: 8px 0;
+    z-index: 1000;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.marquee-content {
+    display: inline-block;
+    animation: marquee 20s linear infinite;
+}
+
+.marquee-content a {
+    color: #fff;
+    text-decoration: underline;
+    margin: 0 20px;
+}
+
+.marquee-content a:hover {
+    color: #ffd700;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
 }
