@@ -52,6 +52,11 @@ const imageUrlsByHeading = {
     "https://i.postimg.cc/T3k4VhpS/IMG-3170.jpg",
     "https://i.postimg.cc/mZMJvb5z/IMG-8471-preview.jpg"
   ],
+  "Demos from event 11": [
+    "https://i.postimg.cc/X7t13H4B/IMG-5118.jpg",
+    "https://i.postimg.cc/9fYLdcTy/IMG-5138.jpg",
+    "https://i.postimg.cc/cLY9JRL9/IMG-5108.jpg"
+  ],
 };
 
 // Track currently visible section and image cycling
