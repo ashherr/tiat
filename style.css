@@ -9,6 +9,7 @@ body {
     margin: 32px 0;
     position: relative;
     margin-top: 40px;
+    margin-bottom: 40px;
 }
 
 main {
@@ -133,36 +134,65 @@ h1, h2, p, td {
 
 .marquee-banner {
     position: fixed;
-    top: 0;
     left: 0;
     width: 100vw;
-    background-color: #000;
-    color: #fff;
     padding: 8px 0;
     z-index: 1000;
     overflow: hidden;
     white-space: nowrap;
 }
 
+.marquee-banner.top {
+    top: 0;
+    background-color: #fff;
+}
+
+.marquee-banner.bottom {
+    bottom: 0;
+    background-color: #fff;
+}
+
 .marquee-content {
     display: inline-block;
-    animation: marquee 15s linear infinite;
     width: 100%;
     text-align: center;
 }
 
+.marquee-content.top {
+    animation: marquee-left-to-right 25s linear infinite;
+}
+
+.marquee-content.bottom {
+    animation: marquee-right-to-left 25s linear infinite;
+}
+
 .marquee-content a {
-    color: #fff;
+    color: #000;
     text-decoration: underline;
     margin: 0 20px;
-    font-size: 1.1em;
+    font-size: 0.8em;
 }
 
 .marquee-content a:hover {
     color: #ffd700;
 }
 
-@keyframes marquee {
+.marquee-content span {
+    margin: 0 20px;
+    font-size: 0.8em;
+    color: #000;
+}
+
+@keyframes marquee-left-to-right {
+    0% {
+        transform: translateX(-100vw);
+    }
+    100% {
+        transform: translateX(100vw);
+    }
+}
+
+@keyframes marquee-right-to-left {
     0% {
         transform: translateX(100vw);
     }
