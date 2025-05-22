@@ -353,24 +353,21 @@
       async function loadGoogleCalendarAPI() {
         console.log('Loading Google Calendar API...');
         return new Promise((resolve, reject) => {
-          gapi.load('client:auth2', {
-            callback: async () => {
-              console.log('Google API loaded, initializing...');
-              try {
-                await window.googleCalendar.initGoogleCalendar();
+          try {
+            window.googleCalendar.initGoogleCalendar()
+              .then(() => {
                 console.log('Google Calendar API initialization complete');
                 googleCalendarInitialized = true;
                 resolve();
-              } catch (error) {
+              })
+              .catch((error) => {
                 console.error('Failed to initialize Google Calendar:', error);
                 reject(error);
-              }
-            },
-            onerror: (error) => {
-              console.error('Failed to load Google API:', error);
-              reject(error);
-            }
-          });
+              });
+          } catch (error) {
+            console.error('Error loading Google Calendar API:', error);
+            reject(error);
+          }
         });
       }
       
