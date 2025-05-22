@@ -7,36 +7,49 @@ let auth2 = null;
 
 // Initialize the Google Calendar API
 async function initGoogleCalendar() {
+  console.log('Initializing Google Calendar API...');
   try {
     // Load the auth2 library
+    console.log('Loading auth2 library...');
     await new Promise((resolve, reject) => {
       gapi.load('auth2', {
         callback: () => {
+          console.log('Auth2 library loaded, initializing...');
           gapi.auth2.init({
             client_id: CLIENT_ID,
             scope: SCOPES
           }).then((auth) => {
+            console.log('Auth2 initialized successfully');
             auth2 = auth;
             resolve();
-          }).catch(reject);
+          }).catch((error) => {
+            console.error('Error initializing auth2:', error);
+            reject(error);
+          });
         },
-        onerror: reject
+        onerror: (error) => {
+          console.error('Error loading auth2 library:', error);
+          reject(error);
+        }
       });
     });
 
     // Load the calendar API
+    console.log('Loading calendar API...');
     await gapi.client.init({
       discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest']
     });
+    console.log('Calendar API loaded');
 
     // Listen for sign-in state changes
     auth2.isSignedIn.listen(updateSigninStatus);
     // Handle the initial sign-in state
     updateSigninStatus(auth2.isSignedIn.get());
     
-    console.log('Google Calendar API initialized');
+    console.log('Google Calendar API initialization complete');
   } catch (error) {
     console.error('Error initializing Google Calendar API:', error);
+    throw error;
   }
 }
 
@@ -51,13 +64,18 @@ function updateSigninStatus(isSignedIn) {
 
 // Handle sign-in
 async function handleAuthClick() {
+  console.log('handleAuthClick called');
   try {
     if (!auth2) {
+      console.error('Auth2 not initialized');
       throw new Error('Auth2 not initialized');
     }
+    console.log('Attempting to sign in...');
     await auth2.signIn();
+    console.log('Sign in successful');
   } catch (error) {
     console.error('Error signing in:', error);
+    throw error;
   }
 }
 

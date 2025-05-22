@@ -347,6 +347,41 @@
     </div>
 
     <script>
+      let googleCalendarInitialized = false;
+
+      // Load the Google Calendar API
+      async function loadGoogleCalendarAPI() {
+        console.log('Loading Google Calendar API...');
+        return new Promise((resolve, reject) => {
+          gapi.load('client:auth2', {
+            callback: async () => {
+              console.log('Google API loaded, initializing...');
+              try {
+                await window.googleCalendar.initGoogleCalendar();
+                console.log('Google Calendar API initialization complete');
+                googleCalendarInitialized = true;
+                resolve();
+              } catch (error) {
+                console.error('Failed to initialize Google Calendar:', error);
+                reject(error);
+              }
+            },
+            onerror: (error) => {
+              console.error('Failed to load Google API:', error);
+              reject(error);
+            }
+          });
+        });
+      }
+      
+      // Load the API when the page loads
+      window.addEventListener('load', () => {
+        console.log('Page loaded, initializing Google Calendar API...');
+        loadGoogleCalendarAPI().catch(error => {
+          console.error('Failed to load Google Calendar API:', error);
+        });
+      });
+
       // Get DOM elements for form toggle
       const submitButton = document.getElementById('submit-event');
       const submissionForm = document.getElementById('submission-form');
@@ -355,9 +390,17 @@
       
       // Toggle submission form display
       submitButton.addEventListener('click', async function() {
+        console.log('Submit button clicked');
         try {
+          if (!googleCalendarInitialized) {
+            console.log('Google Calendar not initialized, initializing now...');
+            await loadGoogleCalendarAPI();
+          }
+          
+          console.log('Attempting to sign in to Google...');
           // Try to sign in to Google first
           await window.googleCalendar.handleAuthClick();
+          console.log('Google sign in successful');
           
           // If sign in successful, show the form
           submissionForm.style.display = 'block';
@@ -725,31 +768,6 @@
               }
             });
           }
-          
-          // Load the Google Calendar API
-          function loadGoogleCalendarAPI() {
-            return new Promise((resolve, reject) => {
-              gapi.load('client:auth2', {
-                callback: async () => {
-                  try {
-                    await window.googleCalendar.initGoogleCalendar();
-                    resolve();
-                  } catch (error) {
-                    console.error('Failed to initialize Google Calendar:', error);
-                    reject(error);
-                  }
-                },
-                onerror: reject
-              });
-            });
-          }
-          
-          // Load the API when the page loads
-          window.addEventListener('load', () => {
-            loadGoogleCalendarAPI().catch(error => {
-              console.error('Failed to load Google Calendar API:', error);
-            });
-          });
           
           // Helper Functions
           function groupEventsByDate(events) {
