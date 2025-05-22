@@ -394,13 +394,33 @@
         try {
           if (!googleCalendarInitialized) {
             console.log('Google Calendar not initialized, initializing now...');
-            await loadGoogleCalendarAPI();
+            try {
+              await loadGoogleCalendarAPI();
+            } catch (initError) {
+              console.error('Failed to initialize Google Calendar:', initError);
+              console.error('Error details:', {
+                message: initError.message,
+                stack: initError.stack,
+                details: initError.details
+              });
+              throw initError;
+            }
           }
           
           console.log('Attempting to sign in to Google...');
           // Try to sign in to Google first
-          await window.googleCalendar.handleAuthClick();
-          console.log('Google sign in successful');
+          try {
+            await window.googleCalendar.handleAuthClick();
+            console.log('Google sign in successful');
+          } catch (signInError) {
+            console.error('Error signing in to Google:', signInError);
+            console.error('Error details:', {
+              message: signInError.message,
+              stack: signInError.stack,
+              details: signInError.details
+            });
+            throw signInError;
+          }
           
           // If sign in successful, show the form
           submissionForm.style.display = 'block';
@@ -413,7 +433,12 @@
             console.warn("Google Maps API not available. Address suggestions disabled.", error);
           }
         } catch (error) {
-          console.error('Error signing in to Google:', error);
+          console.error('Error in submit button handler:', error);
+          console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            details: error.details
+          });
           alert('Please sign in to Google to submit an event');
         }
       });

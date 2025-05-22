@@ -15,20 +15,40 @@ async function initGoogleCalendar() {
       gapi.load('auth2', {
         callback: () => {
           console.log('Auth2 library loaded, initializing...');
-          gapi.auth2.init({
-            client_id: CLIENT_ID,
-            scope: SCOPES
-          }).then((auth) => {
-            console.log('Auth2 initialized successfully');
-            auth2 = auth;
-            resolve();
-          }).catch((error) => {
-            console.error('Error initializing auth2:', error);
-            reject(error);
-          });
+          try {
+            gapi.auth2.init({
+              client_id: CLIENT_ID,
+              scope: SCOPES
+            }).then((auth) => {
+              console.log('Auth2 initialized successfully');
+              auth2 = auth;
+              resolve();
+            }).catch((error) => {
+              console.error('Error initializing auth2:', error);
+              console.error('Error details:', {
+                message: error.message,
+                stack: error.stack,
+                details: error.details
+              });
+              reject(error);
+            });
+          } catch (initError) {
+            console.error('Error in auth2.init:', initError);
+            console.error('Error details:', {
+              message: initError.message,
+              stack: initError.stack,
+              details: initError.details
+            });
+            reject(initError);
+          }
         },
         onerror: (error) => {
           console.error('Error loading auth2 library:', error);
+          console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            details: error.details
+          });
           reject(error);
         }
       });
@@ -36,10 +56,20 @@ async function initGoogleCalendar() {
 
     // Load the calendar API
     console.log('Loading calendar API...');
-    await gapi.client.init({
-      discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest']
-    });
-    console.log('Calendar API loaded');
+    try {
+      await gapi.client.init({
+        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest']
+      });
+      console.log('Calendar API loaded');
+    } catch (clientError) {
+      console.error('Error loading calendar API:', clientError);
+      console.error('Error details:', {
+        message: clientError.message,
+        stack: clientError.stack,
+        details: clientError.details
+      });
+      throw clientError;
+    }
 
     // Listen for sign-in state changes
     auth2.isSignedIn.listen(updateSigninStatus);
@@ -49,6 +79,11 @@ async function initGoogleCalendar() {
     console.log('Google Calendar API initialization complete');
   } catch (error) {
     console.error('Error initializing Google Calendar API:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      details: error.details
+    });
     throw error;
   }
 }
@@ -75,6 +110,11 @@ async function handleAuthClick() {
     console.log('Sign in successful');
   } catch (error) {
     console.error('Error signing in:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      details: error.details
+    });
     throw error;
   }
 }
