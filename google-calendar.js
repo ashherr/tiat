@@ -6,10 +6,23 @@ const SCOPES = 'https://www.googleapis.com/auth/calendar.events';
 // Initialize the Google Calendar API
 async function initGoogleCalendar() {
   try {
+    // Load the auth2 library
+    await new Promise((resolve, reject) => {
+      gapi.load('auth2', {
+        callback: resolve,
+        onerror: reject
+      });
+    });
+
+    // Initialize the auth2 library
+    await gapi.auth2.init({
+      client_id: CLIENT_ID,
+      scope: SCOPES
+    });
+
+    // Load the calendar API
     await gapi.client.init({
-      clientId: CLIENT_ID,
-      scope: SCOPES,
-      discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
+      discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest']
     });
 
     // Listen for sign-in state changes

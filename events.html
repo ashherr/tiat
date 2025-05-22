@@ -719,7 +719,7 @@
           
           // Load the Google Calendar API
           function loadGoogleCalendarAPI() {
-            gapi.load('client:auth2', async () => {
+            gapi.load('client', async () => {
               try {
                 await window.googleCalendar.initGoogleCalendar();
               } catch (error) {
