@@ -349,6 +349,16 @@
       // Initialize Google Calendar API when the page loads
       window.addEventListener('load', async () => {
         try {
+          console.log('Page loaded, waiting for gapi to be ready...');
+          // Wait for gapi to be ready
+          await new Promise((resolve) => {
+            if (window.gapi) {
+              resolve();
+            } else {
+              window.addEventListener('gapi_loaded', resolve);
+            }
+          });
+          console.log('gapi is ready, initializing Google Calendar API...');
           await window.googleCalendar.initGoogleCalendar();
           console.log('Google Calendar API initialized successfully');
         } catch (error) {
