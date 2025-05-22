@@ -3,21 +3,25 @@ const GOOGLE_CALENDAR_ID = '1cec5ca26c8f4a7bb306b18e1c024a7c5370fe7f7813ddbfa127
 const CLIENT_ID = '736097547055-f9vr8rbmq6mkfn88hmgl73l5ln1nn0nd.apps.googleusercontent.com'; // Replace with your OAuth 2.0 Client ID
 const SCOPES = 'https://www.googleapis.com/auth/calendar.events';
 
+let auth2 = null;
+
 // Initialize the Google Calendar API
 async function initGoogleCalendar() {
   try {
     // Load the auth2 library
     await new Promise((resolve, reject) => {
       gapi.load('auth2', {
-        callback: resolve,
+        callback: () => {
+          gapi.auth2.init({
+            client_id: CLIENT_ID,
+            scope: SCOPES
+          }).then((auth) => {
+            auth2 = auth;
+            resolve();
+          }).catch(reject);
+        },
         onerror: reject
       });
-    });
-
-    // Initialize the auth2 library
-    await gapi.auth2.init({
-      client_id: CLIENT_ID,
-      scope: SCOPES
     });
 
     // Load the calendar API
@@ -26,9 +30,9 @@ async function initGoogleCalendar() {
     });
 
     // Listen for sign-in state changes
-    gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+    auth2.isSignedIn.listen(updateSigninStatus);
     // Handle the initial sign-in state
-    updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+    updateSigninStatus(auth2.isSignedIn.get());
     
     console.log('Google Calendar API initialized');
   } catch (error) {
@@ -48,7 +52,10 @@ function updateSigninStatus(isSignedIn) {
 // Handle sign-in
 async function handleAuthClick() {
   try {
-    await gapi.auth2.getAuthInstance().signIn();
+    if (!auth2) {
+      throw new Error('Auth2 not initialized');
+    }
+    await auth2.signIn();
   } catch (error) {
     console.error('Error signing in:', error);
   }
@@ -57,8 +64,12 @@ async function handleAuthClick() {
 // Add an event to Google Calendar
 async function addEventToGoogleCalendar(event) {
   try {
+    if (!auth2) {
+      throw new Error('Auth2 not initialized');
+    }
+
     // Check if user is signed in
-    if (!gapi.auth2.getAuthInstance().isSignedIn.get()) {
+    if (!auth2.isSignedIn.get()) {
       await handleAuthClick();
     }
 
