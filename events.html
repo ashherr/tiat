@@ -346,36 +346,14 @@
     </div>
 
     <script>
-      let googleCalendarInitialized = false;
-
-      // Load the Google Calendar API
-      async function loadGoogleCalendarAPI() {
-        console.log('Loading Google Calendar API...');
-        return new Promise((resolve, reject) => {
-          try {
-            window.googleCalendar.initGoogleCalendar()
-              .then(() => {
-                console.log('Google Calendar API initialization complete');
-                googleCalendarInitialized = true;
-                resolve();
-              })
-              .catch((error) => {
-                console.error('Failed to initialize Google Calendar:', error);
-                reject(error);
-              });
-          } catch (error) {
-            console.error('Error loading Google Calendar API:', error);
-            reject(error);
-          }
-        });
-      }
-      
-      // Load the API when the page loads
-      window.addEventListener('load', () => {
-        console.log('Page loaded, initializing Google Calendar API...');
-        loadGoogleCalendarAPI().catch(error => {
-          console.error('Failed to load Google Calendar API:', error);
-        });
+      // Initialize Google Calendar API when the page loads
+      window.addEventListener('load', async () => {
+        try {
+          await window.googleCalendar.initGoogleCalendar();
+          console.log('Google Calendar API initialized successfully');
+        } catch (error) {
+          console.error('Failed to initialize Google Calendar API:', error);
+        }
       });
 
       // Get DOM elements for form toggle
