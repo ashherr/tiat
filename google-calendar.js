@@ -70,7 +70,7 @@ async function addEventToGoogleCalendar(event) {
 
     // Check if user is signed in
     if (!auth2.isSignedIn.get()) {
-      await handleAuthClick();
+      throw new Error('User must be signed in to add events');
     }
 
     const calendarEvent = {

@@ -354,15 +354,24 @@
       const eventForm = document.getElementById('event-form');
       
       // Toggle submission form display
-      submitButton.addEventListener('click', function() {
-        submissionForm.style.display = 'block';
-        // Initialize Google Places Autocomplete when form is displayed
+      submitButton.addEventListener('click', async function() {
         try {
-          if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-            initPlacesAutocomplete();
+          // Try to sign in to Google first
+          await window.googleCalendar.handleAuthClick();
+          
+          // If sign in successful, show the form
+          submissionForm.style.display = 'block';
+          // Initialize Google Places Autocomplete when form is displayed
+          try {
+            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+              initPlacesAutocomplete();
+            }
+          } catch (error) {
+            console.warn("Google Maps API not available. Address suggestions disabled.", error);
           }
         } catch (error) {
-          console.warn("Google Maps API not available. Address suggestions disabled.", error);
+          console.error('Error signing in to Google:', error);
+          alert('Please sign in to Google to submit an event');
         }
       });
       
