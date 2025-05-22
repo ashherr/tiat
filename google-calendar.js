@@ -19,33 +19,44 @@ async function addEventToGoogleCalendar(event) {
       ...(event.event_url && { htmlLink: event.event_url }),
     };
 
-    // Send the event to the Vercel API endpoint
-    const response = await fetch('/api/add-to-calendar', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        calendarId: GOOGLE_CALENDAR_ID,
-        event: calendarEvent
-      })
+    // Initialize the Google Calendar API
+    await gapi.client.init({
+      apiKey: null,
+      discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to add event to calendar');
-    }
+    // Add the event to the calendar
+    const response = await gapi.client.calendar.events.insert({
+      calendarId: GOOGLE_CALENDAR_ID,
+      resource: calendarEvent
+    });
 
-    const result = await response.json();
-    console.log('Event added to Google Calendar:', result);
-    return result;
+    console.log('Event added to Google Calendar:', response.result);
+    return response.result;
   } catch (error) {
     console.error('Error adding event to Google Calendar:', error);
     throw error;
   }
 }
 
+// Initialize Google Calendar API
+async function initGoogleCalendar() {
+  try {
+    await gapi.load('client', async () => {
+      await gapi.client.init({
+        apiKey: null,
+        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
+      });
+      console.log('Google Calendar API initialized');
+    });
+  } catch (error) {
+    console.error('Error initializing Google Calendar API:', error);
+    throw error;
+  }
+}
+
 // Export functions
 window.googleCalendar = {
-  addEventToGoogleCalendar
+  addEventToGoogleCalendar,
+  initGoogleCalendar
 }; 

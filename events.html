@@ -673,6 +673,8 @@
             eventForm.addEventListener('submit', async (e) => {
               e.preventDefault();
               
+              console.log('Form submitted, validating...');
+              
               // Validate tags - at least one must be selected
               const selectedTags = document.querySelectorAll('input[name="tags"]:checked');
               if (selectedTags.length === 0) {
@@ -689,6 +691,8 @@
               const description = document.getElementById('event-description').value;
               const imageUrl = document.getElementById('event-image').value;
               const eventUrl = document.getElementById('event-url').value;
+              
+              console.log('Form values collected:', { name, date, startTime, endTime, location });
               
               // Get selected tags
               const selectedTagValues = [];
@@ -712,15 +716,18 @@
               };
               
               try {
+                console.log('Saving event to Supabase...');
                 // Save to Supabase
                 const { data, error } = await supabase
                   .from('events')
                   .insert([newEvent]);
                 
                 if (error) throw error;
+                console.log('Event saved to Supabase successfully');
                 
                 // Add to Google Calendar
                 try {
+                  console.log('Adding event to Google Calendar...');
                   await window.googleCalendar.addEventToGoogleCalendar(newEvent);
                   console.log('Event added to Google Calendar successfully');
                 } catch (calendarError) {
