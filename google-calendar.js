@@ -19,7 +19,8 @@ async function initGoogleCalendar() {
             await gapi.client.init({
               clientId: CLIENT_ID,
               scope: SCOPES,
-              discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest']
+              discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
+              ux_mode: 'popup'  // Use popup instead of iframe
             });
             
             auth2 = gapi.auth2.getAuthInstance();
@@ -83,8 +84,11 @@ async function handleAuthClick() {
       throw new Error('Auth2 not initialized');
     }
     console.log('Attempting to sign in...');
-    await auth2.signIn();
-    console.log('Sign in successful');
+    const googleUser = await auth2.signIn({
+      prompt: 'select_account'  // Force account selection
+    });
+    console.log('Sign in successful', googleUser);
+    return googleUser;
   } catch (error) {
     console.error('Error signing in:', error);
     console.error('Error details:', {

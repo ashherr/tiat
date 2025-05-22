@@ -400,7 +400,8 @@
                 stack: initError.stack,
                 details: initError.details
               });
-              throw initError;
+              alert('Unable to initialize Google Calendar. Please try again later.');
+              return;
             }
           }
           
@@ -409,6 +410,16 @@
           try {
             await window.googleCalendar.handleAuthClick();
             console.log('Google sign in successful');
+            // If sign in successful, show the form
+            submissionForm.style.display = 'block';
+            // Initialize Google Places Autocomplete when form is displayed
+            try {
+              if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+                initPlacesAutocomplete();
+              }
+            } catch (error) {
+              console.warn("Google Maps API not available. Address suggestions disabled.", error);
+            }
           } catch (signInError) {
             console.error('Error signing in to Google:', signInError);
             console.error('Error details:', {
@@ -416,18 +427,11 @@
               stack: signInError.stack,
               details: signInError.details
             });
-            throw signInError;
-          }
-          
-          // If sign in successful, show the form
-          submissionForm.style.display = 'block';
-          // Initialize Google Places Autocomplete when form is displayed
-          try {
-            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-              initPlacesAutocomplete();
+            if (signInError.error === 'popup_closed_by_user') {
+              alert('Please complete the Google sign-in process to submit an event.');
+            } else {
+              alert('Unable to sign in to Google. Please try again.');
             }
-          } catch (error) {
-            console.warn("Google Maps API not available. Address suggestions disabled.", error);
           }
         } catch (error) {
           console.error('Error in submit button handler:', error);
@@ -436,7 +440,7 @@
             stack: error.stack,
             details: error.details
           });
-          alert('Please sign in to Google to submit an event');
+          alert('An error occurred. Please try again later.');
         }
       });
       
