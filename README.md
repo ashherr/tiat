@@ -76,3 +76,40 @@ The events are stored in a `events` table with the following structure:
 - Add image uploads to Supabase Storage
 - Add event editing functionality
 - Implement email notifications for new event submissions
+
+# TIAT Calendar
+
+## Google Calendar Integration Setup
+
+1. Create a Google Cloud Project and enable the Google Calendar API
+2. Create a service account and download the credentials
+3. Rename the downloaded credentials file to `service-account.json` and place it in the root directory
+4. Share your Google Calendar with the service account email address
+5. Add the following environment variables to your Vercel project:
+   - `GOOGLE_CALENDAR_ID`: Your Google Calendar ID
+   - `GOOGLE_SERVICE_ACCOUNT_EMAIL`: The service account email
+   - `GOOGLE_PRIVATE_KEY`: The private key from your service account
+   - `GOOGLE_PROJECT_ID`: Your Google Cloud project ID
+
+## Development
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Create a `service-account.json` file based on the template:
+   ```bash
+   cp service-account.template.json service-account.json
+   ```
+
+3. Fill in your service account credentials in `service-account.json`
+
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+## Deployment
+
+This project is configured to deploy to Vercel. Make sure to add all required environment variables in your Vercel project settings.
