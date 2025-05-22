@@ -14,6 +14,7 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBK3OboM6-AnheCB39AoffISaiNzz5SG-Q&libraries=places" onerror="console.warn('Google Maps API failed to load. Address suggestions disabled.');" async defer></script>
     <!-- Add Google Calendar API -->
     <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="google-calendar.js"></script>
     <style>
       body {
@@ -716,14 +717,19 @@
             });
           }
           
-          // Initialize Google Calendar API
-          gapi.load('client', async () => {
-            try {
-              await window.googleCalendar.initGoogleCalendar();
-            } catch (error) {
-              console.error('Failed to initialize Google Calendar:', error);
-            }
-          });
+          // Load the Google Calendar API
+          function loadGoogleCalendarAPI() {
+            gapi.load('client:auth2', async () => {
+              try {
+                await window.googleCalendar.initGoogleCalendar();
+              } catch (error) {
+                console.error('Failed to initialize Google Calendar:', error);
+              }
+            });
+          }
+          
+          // Load the API when the page loads
+          window.addEventListener('load', loadGoogleCalendarAPI);
           
           // Helper Functions
           function groupEventsByDate(events) {

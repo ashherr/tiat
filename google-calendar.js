@@ -1,23 +1,54 @@
 // Google Calendar Integration
 const GOOGLE_CALENDAR_ID = '1cec5ca26c8f4a7bb306b18e1c024a7c5370fe7f7813ddbfa12723bf5455d06b@group.calendar.google.com';
-const API_KEY = 'AIzaSyBK3OboM6-AnheCB39AoffISaiNzz5SG-Q';
+const CLIENT_ID = '736097547055-f9vr8rbmq6mkfn88hmgl73l5ln1nn0nd.apps.googleusercontent.com'; // Replace with your OAuth 2.0 Client ID
+const SCOPES = 'https://www.googleapis.com/auth/calendar.events';
 
 // Initialize the Google Calendar API
 async function initGoogleCalendar() {
   try {
     await gapi.client.init({
-      apiKey: API_KEY,
+      clientId: CLIENT_ID,
+      scope: SCOPES,
       discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
     });
+
+    // Listen for sign-in state changes
+    gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+    // Handle the initial sign-in state
+    updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+    
     console.log('Google Calendar API initialized');
   } catch (error) {
     console.error('Error initializing Google Calendar API:', error);
   }
 }
 
+// Update UI based on sign-in status
+function updateSigninStatus(isSignedIn) {
+  if (isSignedIn) {
+    console.log('User is signed in');
+  } else {
+    console.log('User is not signed in');
+  }
+}
+
+// Handle sign-in
+async function handleAuthClick() {
+  try {
+    await gapi.auth2.getAuthInstance().signIn();
+  } catch (error) {
+    console.error('Error signing in:', error);
+  }
+}
+
 // Add an event to Google Calendar
 async function addEventToGoogleCalendar(event) {
   try {
+    // Check if user is signed in
+    if (!gapi.auth2.getAuthInstance().isSignedIn.get()) {
+      await handleAuthClick();
+    }
+
     const calendarEvent = {
       summary: event.name,
       location: event.location,
@@ -50,4 +81,5 @@ async function addEventToGoogleCalendar(event) {
 window.googleCalendar = {
   initGoogleCalendar,
   addEventToGoogleCalendar,
+  handleAuthClick,
 }; 
