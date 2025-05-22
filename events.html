@@ -12,6 +12,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Google Maps Places API with error handling -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBK3OboM6-AnheCB39AoffISaiNzz5SG-Q&libraries=places" onerror="console.warn('Google Maps API failed to load. Address suggestions disabled.');" async defer></script>
+    <!-- Add Google Calendar API -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="google-calendar.js"></script>
     <style>
       body {
         font-family: 'Kosugi', sans-serif;
@@ -137,7 +140,12 @@
         cursor: pointer;
         font-family: 'Kosugi', sans-serif;
         font-size: 14px;
-        margin-bottom: 15px;
+        text-decoration: none;
+        color: black;
+        display: inline-block;
+        height: 36px;
+        line-height: 20px;
+        box-sizing: border-box;
       }
       /* Style form elements to use Kosugi font */
       input, textarea, select, button, label, small {
@@ -227,12 +235,35 @@
           grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
         }
       }
+      
+      .action-buttons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+      
+      .calendar-buttons {
+        display: flex;
+        gap: 10px;
+        
+      }
+      
+      .submit-button:hover {
+        background-color: #e0e0e0;
+      }
     </style>
   </head>
   <body>
     <h1>sf art + tech events | <a href="index.html">tiat.place</a></h1>
     
-    <button id="submit-event" class="submit-button">submit an event</button>
+    <div class="action-buttons">
+      <button id="submit-event" class="submit-button">submit an event</button>
+      <div class="calendar-buttons">
+        <a href="https://calendar.google.com/calendar/embed?src=1cec5ca26c8f4a7bb306b18e1c024a7c5370fe7f7813ddbfa12723bf5455d06b%40group.calendar.google.com" target="_blank" class="submit-button">view calendar</a>
+        <a href="https://calendar.google.com/calendar/u/0?cid=MWNlYzVjYTI2YzhmNGE3YmIzMDZiMThlMWMwMjRhN2M1MzcwZmU3Zjc4MTNkZGJmYTEyNzIzYmY1NDU1ZDA2YkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t" target="_blank" class="submit-button">add calendar</a>
+      </div>
+    </div>
     
     <div class="filters">
       <span class="filter-label">filter: </span>
@@ -633,17 +664,13 @@
               const imageUrl = document.getElementById('event-image').value;
               const eventUrl = document.getElementById('event-url').value;
               
-              // Debug information
-              console.log('Submitting event with date:', date);
-              console.log('Local timezone:', Intl.DateTimeFormat().resolvedOptions().timeZone);
-              
               // Get selected tags
               const selectedTagValues = [];
               selectedTags.forEach(checkbox => {
                 selectedTagValues.push(checkbox.value);
               });
               
-              // Create event object - do not include timezone_offset as it's not in the database schema
+              // Create event object
               const newEvent = {
                 name,
                 date,
@@ -658,9 +685,6 @@
                 created_at: new Date().toISOString()
               };
               
-              // Debug: log the event object
-              console.log('Event object being sent to database:', newEvent);
-              
               try {
                 // Save to Supabase
                 const { data, error } = await supabase
@@ -669,8 +693,13 @@
                 
                 if (error) throw error;
                 
-                // Debug: log the returned data
-                console.log('Database response:', data);
+                // Add to Google Calendar
+                try {
+                  await window.googleCalendar.addEventToGoogleCalendar(newEvent);
+                } catch (calendarError) {
+                  console.error('Error adding to Google Calendar:', calendarError);
+                  // Continue even if Google Calendar sync fails
+                }
                 
                 // Reset form and hide
                 eventForm.reset();
@@ -686,6 +715,15 @@
               }
             });
           }
+          
+          // Initialize Google Calendar API
+          gapi.load('client', async () => {
+            try {
+              await window.googleCalendar.initGoogleCalendar();
+            } catch (error) {
+              console.error('Failed to initialize Google Calendar:', error);
+            }
+          });
           
           // Helper Functions
           function groupEventsByDate(events) {
