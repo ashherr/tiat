@@ -3,6 +3,7 @@ const GOOGLE_CALENDAR_ID = '1cec5ca26c8f4a7bb306b18e1c024a7c5370fe7f7813ddbfa127
 const CLIENT_ID = '736097547055-f9vr8rbmq6mkfn88hmgl73l5ln1nn0nd.apps.googleusercontent.com';
 
 let isInitialized = false;
+let tokenClient = null;
 
 // Initialize Google Calendar API
 async function initGoogleCalendar() {
@@ -14,9 +15,21 @@ async function initGoogleCalendar() {
   try {
     console.log('Starting Google Calendar API initialization...');
     
-    // First, load the client library
+    // Initialize the token client
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/calendar',
+      callback: (tokenResponse) => {
+        if (tokenResponse && tokenResponse.access_token) {
+          console.log('Access token obtained successfully');
+          isInitialized = true;
+        }
+      },
+    });
+
+    // Load the Calendar API
     await new Promise((resolve, reject) => {
-      gapi.load('client:auth2', {
+      gapi.load('client', {
         callback: () => {
           console.log('gapi.client loaded successfully');
           resolve();
@@ -28,16 +41,12 @@ async function initGoogleCalendar() {
       });
     });
 
-    // Then initialize the client
-    console.log('Initializing gapi.client...');
+    // Initialize the Calendar API
     await gapi.client.init({
-      clientId: CLIENT_ID,
-      scope: 'https://www.googleapis.com/auth/calendar',
       discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest']
     });
 
-    console.log('gapi.client initialized successfully');
-    isInitialized = true;
+    console.log('Google Calendar API initialized successfully');
   } catch (error) {
     console.error('Detailed initialization error:', error);
     throw error;
@@ -53,11 +62,19 @@ async function addEventToGoogleCalendar(event) {
       await initGoogleCalendar();
     }
 
-    // Check if user is signed in
-    const auth2 = gapi.auth2.getAuthInstance();
-    if (!auth2.isSignedIn.get()) {
-      console.log('User not signed in, initiating sign in...');
-      await auth2.signIn();
+    // Request access token if needed
+    if (!gapi.client.getToken()) {
+      console.log('Requesting access token...');
+      await new Promise((resolve, reject) => {
+        tokenClient.requestAccessToken({ prompt: 'consent' });
+        tokenClient.callback = (response) => {
+          if (response.error) {
+            reject(response);
+          } else {
+            resolve(response);
+          }
+        };
+      });
     }
 
     console.log('Creating calendar event:', event);

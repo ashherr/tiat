@@ -14,8 +14,8 @@
     <!-- Google Maps Places API with error handling -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBK3OboM6-AnheCB39AoffISaiNzz5SG-Q&libraries=places" onerror="console.warn('Google Maps API failed to load. Address suggestions disabled.');" async defer></script>
     <!-- Add Google Calendar API -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js"></script>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="google-calendar.js"></script>
     <style>
       body {
@@ -350,16 +350,16 @@
       // Initialize Google Calendar API when the page loads
       window.addEventListener('load', async () => {
         try {
-          console.log('Page loaded, waiting for gapi to be ready...');
-          // Wait for gapi to be ready
+          console.log('Page loaded, waiting for Google Identity Services to be ready...');
+          // Wait for Google Identity Services to be ready
           await new Promise((resolve) => {
-            if (window.gapi) {
+            if (window.google?.accounts) {
               resolve();
             } else {
-              window.addEventListener('gapi_loaded', resolve);
+              window.addEventListener('google_identity_services_ready', resolve);
             }
           });
-          console.log('gapi is ready, initializing Google Calendar API...');
+          console.log('Google Identity Services is ready, initializing Google Calendar API...');
           await window.googleCalendar.initGoogleCalendar();
           console.log('Google Calendar API initialized successfully');
         } catch (error) {
