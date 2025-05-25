@@ -888,7 +888,7 @@
       async function updateVisitorCount() {
         try {
           // Get the current count from Supabase
-          const { data: countData, error: countError } = await window.supabase
+          const { data: countData, error: countError } = await supabase
             .from('visitor_count')
             .select('count')
             .single();
@@ -901,7 +901,7 @@
 
           // Increment the count
           const newCount = (countData?.count || 0) + 1;
-          const { error: updateError } = await window.supabase
+          const { error: updateError } = await supabase
             .from('visitor_count')
             .update({ count: newCount })
             .eq('id', 1);
@@ -919,10 +919,16 @@
         }
       }
 
-      // Call the function when the page loads
-      document.addEventListener('DOMContentLoaded', () => {
-        console.log('Page loaded, updating visitor count...');
-        updateVisitorCount();
+      // Call the function when the page loads and Supabase is initialized
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          // Wait for Supabase to be initialized
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          console.log('Page loaded, updating visitor count...');
+          updateVisitorCount();
+        } catch (error) {
+          console.error('Error in DOMContentLoaded:', error);
+        }
       });
     </script>
   </body>
