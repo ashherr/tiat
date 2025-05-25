@@ -347,6 +347,37 @@
     </div>
 
     <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-MCCV52KT3X');
+      
+      // Track page view for events page
+      gtag('event', 'page_view', {
+        'page_title': 'TIAT Events',
+        'page_location': window.location.href,
+        'page_path': '/events'
+      });
+
+      // Track event submissions
+      document.getElementById('event-form').addEventListener('submit', function(e) {
+        gtag('event', 'event_submission', {
+          'event_category': 'Events',
+          'event_label': 'New Event Submission'
+        });
+      });
+
+      // Track event clicks
+      document.addEventListener('click', function(e) {
+        if (e.target.matches('.event-card')) {
+          gtag('event', 'event_click', {
+            'event_category': 'Events',
+            'event_label': e.target.querySelector('h3').textContent
+          });
+        }
+      });
+
       // Initialize Google Calendar API when the page loads
       window.addEventListener('load', async () => {
         try {

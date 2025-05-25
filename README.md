@@ -28,7 +28,7 @@ A lightweight events listing and submission system for [tiat.place](http://tiat.
 
 ### 2. Configure the Front-end
 
-1. Open `events.html` and update the Supabase credentials:
+1. Open `/events` and update the Supabase credentials:
    ```javascript
    const supabaseUrl = 'YOUR_SUPABASE_URL';
    const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
@@ -37,14 +37,14 @@ A lightweight events listing and submission system for [tiat.place](http://tiat.
 ### 3. Deploy
 
 1. Upload the following files to your web server:
-   - `index.html` (with the link to events.html)
-   - `events.html`
+   - `index.html` (with the link to /events)
+   - `/events`
    - Other site assets (CSS, images, etc.)
 
 ## File Structure
 
 - `index.html` - Main site with link to events page
-- `events.html` - Public events listing and submission page
+- `/events` - Public events listing and submission page
 - `supabase_schema.sql` - SQL schema for Supabase setup
 - `README.md` - This file
 
@@ -85,31 +85,8 @@ The events are stored in a `events` table with the following structure:
 2. Create a service account and download the credentials
 3. Rename the downloaded credentials file to `service-account.json` and place it in the root directory
 4. Share your Google Calendar with the service account email address
-5. Add the following environment variables to your Vercel project:
+5. Add the following environment variables to your Vercel project settings:
    - `GOOGLE_CALENDAR_ID`: Your Google Calendar ID
    - `GOOGLE_SERVICE_ACCOUNT_EMAIL`: The service account email
    - `GOOGLE_PRIVATE_KEY`: The private key from your service account
-   - `GOOGLE_PROJECT_ID`: Your Google Cloud project ID
-
-## Development
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Create a `service-account.json` file based on the template:
-   ```bash
-   cp service-account.template.json service-account.json
-   ```
-
-3. Fill in your service account credentials in `service-account.json`
-
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-## Deployment
-
-This project is configured to deploy to Vercel. Make sure to add all required environment variables in your Vercel project settings.
+   - `
