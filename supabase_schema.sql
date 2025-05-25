@@ -74,4 +74,16 @@ RETURNS TIMESTAMP WITH TIME ZONE
 LANGUAGE SQL
 AS $$
   SELECT NOW();
-$$; 
+$$;
+
+-- Create visitor count table
+CREATE TABLE IF NOT EXISTS visitor_count (
+    id INTEGER PRIMARY KEY DEFAULT 1,
+    count INTEGER DEFAULT 0,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert initial count if table is empty
+INSERT INTO visitor_count (id, count)
+SELECT 1, 0
+WHERE NOT EXISTS (SELECT 1 FROM visitor_count); 

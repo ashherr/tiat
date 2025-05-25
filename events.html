@@ -868,21 +868,38 @@
       // Initialize visitor counter
       async function updateVisitorCount() {
         try {
-          const response = await fetch('https://api.countapi.xyz/hit/tiat.place/visits');
-          const data = await response.json();
-          const countElement = document.getElementById('visitor-count');
-          if (countElement) {
-            countElement.textContent = `${data.value.toLocaleString()} visitors`;
-            console.log('Visitor count updated:', data.value);
+          // Get the current count from Supabase
+          const { data: countData, error: countError } = await supabase
+            .from('visitor_count')
+            .select('count')
+            .single();
+
+          if (countError) {
+            // If the table doesn't exist, create it and initialize count
+            if (countError.code === 'PGRST116') {
+              const { error: createError } = await supabase
+                .from('visitor_count')
+                .insert([{ count: 1 }]);
+              
+              if (createError) throw createError;
+              document.getElementById('visitor-count').textContent = '1 visitor';
+            } else {
+              throw countError;
+            }
           } else {
-            console.error('Visitor count element not found');
+            // Increment the count
+            const newCount = (countData?.count || 0) + 1;
+            const { error: updateError } = await supabase
+              .from('visitor_count')
+              .update({ count: newCount })
+              .eq('id', 1);
+
+            if (updateError) throw updateError;
+            document.getElementById('visitor-count').textContent = `${newCount.toLocaleString()} visitors`;
           }
         } catch (error) {
           console.error('Error updating visitor count:', error);
-          const countElement = document.getElementById('visitor-count');
-          if (countElement) {
-            countElement.textContent = '';
-          }
+          document.getElementById('visitor-count').textContent = '';
         }
       }
 
