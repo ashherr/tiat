@@ -136,18 +136,19 @@
       }
       /* Style for the submit event button */
       .submit-button {
-        padding: 8px 16px;
+        padding: 8px 12px;
         background-color: #f0f0f0;
         border: none;
         cursor: pointer;
         font-family: 'Kosugi', sans-serif;
-        font-size: 14px;
+        font-size: 13px;
         text-decoration: none;
         color: black;
         display: inline-block;
-        height: 36px;
-        line-height: 20px;
+        height: 32px;
+        line-height: 16px;
         box-sizing: border-box;
+        white-space: nowrap;
       }
       /* Style form elements to use Kosugi font */
       input, textarea, select, button, label, small {
@@ -236,6 +237,21 @@
         #tag-checkboxes {
           grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
         }
+        .action-buttons {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        
+        .calendar-buttons {
+          justify-content: space-between;
+        }
+        
+        .submit-button {
+          font-size: 12px;
+          padding: 6px 10px;
+          height: 28px;
+          line-height: 16px;
+        }
       }
       
       .action-buttons {
@@ -243,11 +259,14 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
       }
       
       .calendar-buttons {
         display: flex;
         gap: 10px;
+        flex-wrap: wrap;
       }
       
       .submit-button:hover {
@@ -259,7 +278,7 @@
     <h1>sf art + tech events | <a href="index.html">tiat.place</a></h1>
     
     <div class="action-buttons">
-      <button id="submit-event" class="submit-button">submit an event</button>
+      <button id="submit-event" class="submit-button">submit event</button>
       <div class="calendar-buttons">
         <a href="https://calendar.google.com/calendar/embed?src=1cec5ca26c8f4a7bb306b18e1c024a7c5370fe7f7813ddbfa12723bf5455d06b%40group.calendar.google.com" target="_blank" class="submit-button">view calendar</a>
         <a href="https://calendar.google.com/calendar/u/0?cid=MWNlYzVjYTI2YzhmNGE3YmIzMDZiMThlMWMwMjRhN2M1MzcwZmU3Zjc4MTNkZGJmYTEyNzIzYmY1NDU1ZDA2YkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t" target="_blank" class="submit-button">add calendar</a>
