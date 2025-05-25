@@ -286,11 +286,6 @@
       <div class="loading">Loading events...</div>
     </div>
 
-    <!-- Visitor Counter -->
-    <div style="text-align: center; margin-top: 40px; font-size: 12px; color: #666;">
-      <span id="visitor-count">Loading visitors...</span>
-    </div>
-
     <!-- Event Submission Form (Hidden by Default) -->
     <div id="submission-form" style="display:none;">
       <h2>Submit an Event</h2>
@@ -349,6 +344,11 @@
         <button type="submit" class="btn">Submit Event</button>
         <button type="button" id="cancel-submission" class="btn">Cancel</button>
       </form>
+    </div>
+
+    <!-- Visitor Counter -->
+    <div style="text-align: center; margin: 40px 0 20px 0; font-size: 14px; color: #666; font-family: 'Kosugi', sans-serif; border-top: 1px solid #eee; padding-top: 20px;">
+      <span id="visitor-count">Loading visitors...</span>
     </div>
 
     <script>
@@ -865,21 +865,32 @@
         }
       });
 
-      // Add this at the beginning of your script section
       // Initialize visitor counter
       async function updateVisitorCount() {
         try {
           const response = await fetch('https://api.countapi.xyz/hit/tiat.place/visits');
           const data = await response.json();
-          document.getElementById('visitor-count').textContent = `${data.value.toLocaleString()} visitors`;
+          const countElement = document.getElementById('visitor-count');
+          if (countElement) {
+            countElement.textContent = `${data.value.toLocaleString()} visitors`;
+            console.log('Visitor count updated:', data.value);
+          } else {
+            console.error('Visitor count element not found');
+          }
         } catch (error) {
           console.error('Error updating visitor count:', error);
-          document.getElementById('visitor-count').textContent = '';
+          const countElement = document.getElementById('visitor-count');
+          if (countElement) {
+            countElement.textContent = '';
+          }
         }
       }
 
       // Call the function when the page loads
-      document.addEventListener('DOMContentLoaded', updateVisitorCount);
+      document.addEventListener('DOMContentLoaded', () => {
+        console.log('Page loaded, updating visitor count...');
+        updateVisitorCount();
+      });
     </script>
   </body>
 </html> 
