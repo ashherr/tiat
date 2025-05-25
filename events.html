@@ -869,34 +869,31 @@
       async function updateVisitorCount() {
         try {
           // Get the current count from Supabase
-          const { data: countData, error: countError } = await supabase
+          const { data: countData, error: countError } = await window.supabase
             .from('visitor_count')
             .select('count')
             .single();
 
           if (countError) {
-            // If the table doesn't exist, create it and initialize count
-            if (countError.code === 'PGRST116') {
-              const { error: createError } = await supabase
-                .from('visitor_count')
-                .insert([{ count: 1 }]);
-              
-              if (createError) throw createError;
-              document.getElementById('visitor-count').textContent = '1 visitor';
-            } else {
-              throw countError;
-            }
-          } else {
-            // Increment the count
-            const newCount = (countData?.count || 0) + 1;
-            const { error: updateError } = await supabase
-              .from('visitor_count')
-              .update({ count: newCount })
-              .eq('id', 1);
-
-            if (updateError) throw updateError;
-            document.getElementById('visitor-count').textContent = `${newCount.toLocaleString()} visitors`;
+            console.error('Error getting count:', countError);
+            document.getElementById('visitor-count').textContent = '';
+            return;
           }
+
+          // Increment the count
+          const newCount = (countData?.count || 0) + 1;
+          const { error: updateError } = await window.supabase
+            .from('visitor_count')
+            .update({ count: newCount })
+            .eq('id', 1);
+
+          if (updateError) {
+            console.error('Error updating count:', updateError);
+            document.getElementById('visitor-count').textContent = '';
+            return;
+          }
+
+          document.getElementById('visitor-count').textContent = `${newCount.toLocaleString()} visitors`;
         } catch (error) {
           console.error('Error updating visitor count:', error);
           document.getElementById('visitor-count').textContent = '';
