@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>submit | the intersection of art & technology</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Kosugi', sans-serif;
+        margin: 20px;
+        line-height: 1.6;
+        font-size: 14px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      h1 {
+        font-size: 18px;
+        word-wrap: break-word;
+      }
+      .date {
+        font-weight: bold;
+        margin-top: 20px;
+        font-size: 14px;
+      }
+      .link {
+        margin-left: 20px;
+        font-size: 14px;
+        margin-bottom: 10px;
+        word-wrap: break-word;
+      }
+      .link a {
+        color: black;
+        text-decoration: none;
+      }
+      .link a:hover {
+        text-decoration: underline;
+      }
+      
+      /* Mobile Styles */
+      @media (max-width: 480px) {
+        body {
+          padding: 10px;
+        }
+        h1 {
+          font-size: 16px;
+        }
+        .link {
+          margin-left: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>art + technology open calls | <a href="index.html">tiat.place</a></h1>
+    
+    <div id="links-container">
+      <!-- Example structure - you can edit this manually -->
+      <div class="date">DUE JUNE 1, 2025</div>
+      <div class="link">
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSeWqb5PTw2t2fRLLy-FqgrLZp74wPMC6nXLgjj3kX9BYPFbOg/viewform" target="_blank">human tech week</a>
+      </div>
+
+      <div class="link">
+        <a href="https://forms.gle/N6nbeshp6MByPqog9" target="_blank">solar art installation for stealth launch party</a>
+      </div>
+      
+      <div class="date">DUE JULY 1, 2025</div>
+      <div class="link">
+        <a href="https://www.hci.place/" target="_blank">hci.place</a>
+      </div>
+      
+     
+    </div>
+
+    <!-- Marquee Banner -->
+    <div class="marquee-banner bottom">
+      <div class="marquee-content bottom">
+        <a href="https://givebutter.com/tiatplace" target="_blank">⊹ ࣪ ˖ support tiat ⊹ ࣪ ˖</a>
+        <a href="https://givebutter.com/tiatplace" target="_blank">⊹ ࣪ ˖ support tiat ⊹ ࣪ ˖</a>
+        <a href="https://givebutter.com/tiatplace" target="_blank">⊹ ࣪ ˖ support tiat ⊹ ࣪ ˖</a>
+        <a href="https://givebutter.com/tiatplace" target="_blank">⊹ ࣪ ˖ support tiat ⊹ ࣪ ˖</a>
+        <a href="https://givebutter.com/tiatplace" target="_blank">⊹ ࣪ ˖ support tiat ⊹ ࣪ ˖</a>
+      </div>
+    </div>
+
+    <!-- Add bottom padding to prevent content from being hidden behind the marquee -->
+    <div style="height: 40px;"></div>
+
+    <style>
+      .marquee-banner {
+        position: fixed;
+        left: 0;
+        width: 100vw;
+        padding: 8px 0;
+        z-index: 1000;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .marquee-banner.bottom {
+        bottom: 0;
+        background-color: #fff;
+      }
+
+      .marquee-content {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .marquee-content.bottom {
+        animation: marquee-right-to-left 25s linear infinite;
+      }
+
+      .marquee-content a {
+        color: #000;
+        text-decoration: underline;
+        margin: 0 10px;
+        font-size: 0.8em;
+        display: inline-block;
+      }
+
+      .marquee-content a:hover {
+        color: #ffd700;
+      }
+
+      @keyframes marquee-right-to-left {
+        0% {
+          transform: translateX(-50%);
+        }
+        100% {
+          transform: translateX(0);
+        }
+      }
+    </style>
+  </body>
+</html> 
