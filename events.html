@@ -284,6 +284,53 @@
       .submit-button:hover {
         background-color: #e0e0e0;
       }
+
+      .marquee-banner {
+        position: fixed;
+        left: 0;
+        width: 100vw;
+        padding: 8px 0;
+        z-index: 1000;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .marquee-banner.bottom {
+        bottom: 0;
+        background-color: #fff;
+      }
+
+      .marquee-content {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .marquee-content.bottom {
+        animation: marquee-right-to-left 25s linear infinite;
+      }
+
+      .marquee-content a {
+        color: #000;
+        text-decoration: underline;
+        margin: 0 10px;
+        font-size: 0.8em;
+        display: inline-block;
+      }
+
+      .marquee-content a:hover {
+        color: #ffd700;
+      }
+
+      @keyframes marquee-right-to-left {
+        0% {
+          transform: translateX(-50%);
+        }
+        100% {
+          transform: translateX(0);
+        }
+      }
     </style>
   </head>
   <body>
@@ -381,6 +428,20 @@
     <div style="margin: 40px 0 20px 0; font-size: 14px; color: #666; font-family: 'Kosugi', sans-serif; border-top: 1px solid #eee; padding-top: 20px;">
       <span id="visitor-count">loading visitors...</span>
     </div>
+
+    <!-- Marquee Banner -->
+    <div class="marquee-banner bottom">
+      <div class="marquee-content bottom">
+        <a href="https://givebutter.com/tiatplace" target="_blank">⊹ ࣪ ˖ support tiat ⊹ ࣪ ˖</a>
+        <a href="https://givebutter.com/tiatplace" target="_blank">⊹ ࣪ ˖ support tiat ⊹ ࣪ ˖</a>
+        <a href="https://givebutter.com/tiatplace" target="_blank">⊹ ࣪ ˖ support tiat ⊹ ࣪ ˖</a>
+        <a href="https://givebutter.com/tiatplace" target="_blank">⊹ ࣪ ˖ support tiat ⊹ ࣪ ˖</a>
+        <a href="https://givebutter.com/tiatplace" target="_blank">⊹ ࣪ ˖ support tiat ⊹ ࣪ ˖</a>
+      </div>
+    </div>
+
+    <!-- Add bottom padding to prevent content from being hidden behind the marquee -->
+    <div style="height: 40px;"></div>
 
     <script>
       window.dataLayer = window.dataLayer || [];
