@@ -507,15 +507,44 @@
       const eventForm = document.getElementById('event-form');
       
       // Toggle submission form display
-      submitButton.addEventListener('click', function() {
-        submissionForm.style.display = 'block';
-        // Initialize Google Places Autocomplete when form is displayed
+      submitButton.addEventListener('click', async () => {
         try {
-          if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-            initPlacesAutocomplete();
-          }
+            // Get the user's IP address
+            const ipResponse = await fetch('https://api.ipify.org?format=json');
+            const { ip } = await ipResponse.json();
+
+            // Check if it's your IP
+            if (ip === '24.23.168.180') {
+                // If it's your IP, show the form
+                document.getElementById('submission-form').style.display = 'block';
+                // Initialize Google Places Autocomplete when form is displayed
+                try {
+                    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+                        initPlacesAutocomplete();
+                    }
+                } catch (error) {
+                    console.warn("Google Maps API not available. Address suggestions disabled.", error);
+                }
+            } else {
+                // If not your IP, open email client and ensure form is hidden
+                document.getElementById('submission-form').style.display = 'none';
+                const subject = 'New Event Submission for TIAT Calendar';
+                const body = 'Please include the following details:\n\n' +
+                            'Event Name:\n' +
+                            'Date:\n' +
+                            'Start Time:\n' +
+                            'End Time:\n' +
+                            'Location:\n' +
+                            'Description:\n' +
+                            'Image URL:\n' +
+                            'Event URL:\n' +
+                            'Tags (select from: generative, hardware, internet, projection, installation, XR, sound, AI/ML, speculative, data, fabrication):\n\n' +
+                            'Thank you!';
+                window.location.href = `mailto:imempowa@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            }
         } catch (error) {
-          console.warn("Google Maps API not available. Address suggestions disabled.", error);
+            console.error('Error checking IP:', error);
+            alert('There was an error processing your request. Please try again later.');
         }
       });
       
@@ -950,46 +979,6 @@
           
           // Fallback to regular date parsing
           return new Date(dateString);
-        }
-      });
-
-      document.getElementById('submit-event').addEventListener('click', async () => {
-        try {
-            // Get the user's IP address
-            const ipResponse = await fetch('https://api.ipify.org?format=json');
-            const { ip } = await ipResponse.json();
-
-            // Check if it's your IP
-            if (ip === '24.23.168.180') {
-                // If it's your IP, show the form
-                document.getElementById('submission-form').style.display = 'block';
-                // Initialize Google Places Autocomplete when form is displayed
-                try {
-                    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-                        initPlacesAutocomplete();
-                    }
-                } catch (error) {
-                    console.warn("Google Maps API not available. Address suggestions disabled.", error);
-                }
-            } else {
-                // If not your IP, open email client
-                const subject = 'New Event Submission for TIAT Calendar';
-                const body = 'Please include the following details:\n\n' +
-                            'Event Name:\n' +
-                            'Date:\n' +
-                            'Start Time:\n' +
-                            'End Time:\n' +
-                            'Location:\n' +
-                            'Description:\n' +
-                            'Image URL:\n' +
-                            'Event URL:\n' +
-                            'Tags (select from: generative, hardware, internet, projection, installation, XR, sound, AI/ML, speculative, data, fabrication):\n\n' +
-                            'Thank you!';
-                window.location.href = `mailto:imempowa@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            }
-        } catch (error) {
-            console.error('Error checking IP:', error);
-            alert('There was an error processing your request. Please try again later.');
         }
       });
     </script>
