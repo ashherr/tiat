@@ -211,6 +211,7 @@ h1, h2, p, td {
     left: 0;
     right: 0;
     z-index: 1002;
+    --header-height: 60px;
 }
 .header-title {
     padding: 0 10px;
@@ -268,7 +269,7 @@ h1, h2, p, td {
 /* --- SIDENAV --- */
 .sidebar {
     position: fixed;
-    top: 60px;
+    top: calc(var(--header-height, 60px) + 0px);
     left: 0;
     right: 0;
     z-index: 1001;
@@ -325,7 +326,7 @@ h1, h2, p, td {
 
 /* --- MAIN CONTENT --- */
 .site-content {
-    padding-top: 130px !important;
+    padding-top: calc(var(--header-height, 60px) + 70px) !important;
     margin-left: 0;
     margin-right: 340px;
     max-width: calc(100vw - 340px);
@@ -391,6 +392,7 @@ h1, h2, p, td {
         align-items: flex-start;
         padding: 5px;
         justify-content: space-between;
+        --header-height: 80px;
     }
     .header-title {
         order: 1;
@@ -432,7 +434,7 @@ h1, h2, p, td {
     }
     .sidebar {
         position: fixed;
-        top: 55px;
+        top: calc(var(--header-height, 80px) - 20px);
         left: 0;
         right: 0;
         z-index: 1000;
