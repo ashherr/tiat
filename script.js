@@ -175,15 +175,11 @@ function updateSalonImageOnScroll() {
     salonCycleIntervalId = null;
   }
   
-  // Check if we're in mobile view (image-box is fixed)
-  const imageBox = document.getElementById('image-box');
-  const isMobile = window.innerWidth <= 1100;
-  
-  // Set up observer with appropriate root and settings
+  // Set up observer with viewport as root for consistent behavior
   const observerOptions = {
-    root: isMobile ? null : document.querySelector('.site-content'),
-    rootMargin: isMobile ? '-200px 0px -50% 0px' : '0px',
-    threshold: isMobile ? 0.05 : 0.1
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.1
   };
   
   window.salonSectionObserver = new IntersectionObserver((entries) => {
