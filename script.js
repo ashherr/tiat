@@ -1,10 +1,11 @@
 /* Control background image as user scrolls through sections */
-const sections = document.querySelectorAll('section');
-const backgroundImage = document.getElementById('background-image');
+// const sections = document.querySelectorAll('section');
+// const backgroundImage = document.getElementById('background-image');
 
-// Set initial opacity for background image
-backgroundImage.style.opacity = '.5';  // 50% opacity (50% transparent)
+// Removed background image logic since the element no longer exists
+// backgroundImage.style.opacity = '.5';  // 50% opacity (50% transparent)
 
+// Use a single imageUrlsByHeading definition for both background and salon image logic
 const imageUrlsByHeading = {
   "Demos from event 1": [
     "https://i.postimg.cc/QMdPQRzg/tiat1.png"
@@ -64,7 +65,7 @@ let currentVisibleSection = null;
 let cycleIntervalId = null;
 let currentImageIndex = 0;
 
-// Intersection Observer to detect when sections are in view
+// Intersection Observer to detect when sections are in view (background image logic)
 const observerOptions = {
   root: null,
   rootMargin: '0px',
@@ -76,31 +77,25 @@ const observer = new IntersectionObserver((entries) => {
     const section = entry.target;
     const eventHeading = section.querySelector('.event-heading');
     if (!eventHeading) return;
-    
     const heading = eventHeading.getAttribute('data-heading');
     const imageUrls = imageUrlsByHeading[heading];
-    
     if (!imageUrls) return;
-    
     if (entry.isIntersecting) {
       // Stop any existing image cycling
       if (cycleIntervalId) {
         clearInterval(cycleIntervalId);
       }
-      
       // Update current visible section
       currentVisibleSection = section;
       currentImageIndex = 0;
-      
       // Set initial image
-      backgroundImage.src = imageUrls[0];
-      backgroundImage.style.opacity = '.5';  // 50% opacity
-      
+      // backgroundImage.src = imageUrls[0];
+      // backgroundImage.style.opacity = '.5';  // 50% opacity
       // Start cycling images without fade transition
       cycleIntervalId = setInterval(() => {
         currentImageIndex = (currentImageIndex + 1) % imageUrls.length;
-        backgroundImage.src = imageUrls[currentImageIndex];
-        backgroundImage.style.opacity = '.5';  // Keep opacity consistent
+        // backgroundImage.src = imageUrls[currentImageIndex];
+        // backgroundImage.style.opacity = '.5';  // Keep opacity consistent
       }, 3000);
     } else if (section === currentVisibleSection && !entry.isIntersecting) {
       // If the current section is no longer visible
@@ -114,6 +109,121 @@ const observer = new IntersectionObserver((entries) => {
 }, observerOptions);
 
 // Start observing each section
-sections.forEach(section => {
-  observer.observe(section);
+// sections.forEach(section => {
+//   observer.observe(section);
+// });
+
+// --- Sidebar Navigation Logic ---
+const navItems = document.querySelectorAll('.nav-item');
+const contentSections = document.querySelectorAll('.content-section');
+const salonImageBox = document.getElementById('image-box');
+const salonImage = document.getElementById('salon-image');
+
+function showSection(page) {
+  contentSections.forEach(section => {
+    section.classList.remove('active');
+  });
+  const activeSection = document.getElementById(`${page}-content`);
+  if (activeSection) activeSection.classList.add('active');
+
+  navItems.forEach(item => {
+    item.classList.toggle('active', item.dataset.page === page);
+  });
+
+  // Show/hide image box
+  if (page === 'salons') {
+    salonImageBox.style.display = '';
+    updateSalonImageOnScroll();
+  } else {
+    salonImageBox.style.display = 'none';
+    if (salonImage) salonImage.src = '';
+  }
+}
+
+navItems.forEach(item => {
+  item.addEventListener('click', () => {
+    const page = item.dataset.page;
+    showSection(page);
+    window.history.pushState({ page }, '', page === 'salons' ? '/' : `/${page}`);
+  });
 });
+
+window.addEventListener('popstate', (e) => {
+  const page = (e.state && e.state.page) || (window.location.pathname.replace('/', '') || 'salons');
+  showSection(page);
+});
+
+// --- Salon Image Scroll Logic ---
+const salonSections = document.querySelectorAll('#salons-content section');
+let currentSalonSection = null;
+let salonCycleIntervalId = null;
+let salonCurrentImageIndex = 0;
+
+function fadeToImage(url) {
+  if (!salonImage) return;
+  salonImage.src = url;
+}
+
+function updateSalonImageOnScroll() {
+  if (!salonImage) return;
+  // Remove any previous observer/interval
+  if (window.salonSectionObserver) {
+    window.salonSectionObserver.disconnect();
+  }
+  if (salonCycleIntervalId) {
+    clearInterval(salonCycleIntervalId);
+    salonCycleIntervalId = null;
+  }
+  
+  // Check if we're in mobile view (image-box is fixed)
+  const imageBox = document.getElementById('image-box');
+  const isMobile = window.innerWidth <= 1100;
+  
+  // Set up observer with appropriate root and settings
+  const observerOptions = {
+    root: isMobile ? null : document.querySelector('.site-content'),
+    rootMargin: isMobile ? '-200px 0px -50% 0px' : '0px',
+    threshold: isMobile ? 0.05 : 0.1
+  };
+  
+  window.salonSectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const section = entry.target;
+      const eventHeading = section.querySelector('.event-heading');
+      if (!eventHeading) return;
+      const heading = eventHeading.getAttribute('data-heading');
+      const imageUrls = imageUrlsByHeading[heading];
+      if (!imageUrls) return;
+      if (entry.isIntersecting) {
+        // Stop any existing image cycling
+        if (salonCycleIntervalId) clearInterval(salonCycleIntervalId);
+        currentSalonSection = section;
+        salonCurrentImageIndex = 0;
+        fadeToImage(imageUrls[0]);
+        // Start cycling images
+        if (imageUrls.length > 1) {
+          salonCycleIntervalId = setInterval(() => {
+            salonCurrentImageIndex = (salonCurrentImageIndex + 1) % imageUrls.length;
+            fadeToImage(imageUrls[salonCurrentImageIndex]);
+          }, 1000);
+        }
+      } else if (section === currentSalonSection && !entry.isIntersecting) {
+        if (salonCycleIntervalId) {
+          clearInterval(salonCycleIntervalId);
+          salonCycleIntervalId = null;
+        }
+        currentSalonSection = null;
+      }
+    });
+  }, observerOptions);
+  
+  salonSections.forEach(section => {
+    window.salonSectionObserver.observe(section);
+  });
+}
+
+// On load, show the correct section based on URL
+(function initPageFromUrl() {
+  const path = window.location.pathname.replace('/', '') || 'salons';
+  showSection(path);
+})();
