@@ -1,0 +1,30 @@
+{
+  "upcoming": [
+    {
+      "id": "exhibition-1",
+      "title": "Your Show?",
+      "description": "Need immersive art for your event? Got a show you'd like to do? Reach out!",
+      "date": "TBD",
+      "time": "TBD",
+      "link": "mailto:imempowa@gmail.com?subject=TIAT%20Exhibition",
+      "flyer": "https://i.postimg.cc/gc63D9gt/tiat-blank.png",
+      "images": [
+        "https://i.postimg.cc/gc63D9gt/tiat-blank.png"
+      ]
+    }
+  ],
+  "past": [
+    {
+      "id": "exhibition-1",
+      "title": "Solar Party",
+      "description": "We partnered with Zoltux to host a party featuring solar-inspired immersive art installations.",
+      "date": "2024-06-20",
+      "link": "https://partiful.com/e/nZBnYb0QOdicmq5ocdze",
+      "flyer": "https://partiful.imgix.net/user/xpJ7yCjmY8dv4iTUJRv3mFqgA3y1/838622f9-c4f3-4ba3-bc?fit=clip&w=800&auto=format",
+      "images": [
+        "https://i.postimg.cc/5Np2Mq1z/joepmirror.gif",
+        "https://i.postimg.cc/Bb44rtVN/nocellcov-pyramid.gif"
+      ]
+    }
+  ]
+} 

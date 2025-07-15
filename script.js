@@ -225,6 +225,10 @@ function updateSalonImageOnScroll() {
 let workshopsData = null;
 const workshopImageUrlsByHeading = {};
 
+// Exhibition data and functionality
+let exhibitionsData = null;
+const exhibitionImageUrlsByHeading = {};
+
 // Load workshop data
 async function loadWorkshopData() {
   try {
@@ -247,6 +251,31 @@ async function loadWorkshopData() {
     renderWorkshops();
   } catch (error) {
     console.error('Error loading workshop data:', error);
+  }
+}
+
+// Load exhibition data
+async function loadExhibitionData() {
+  try {
+    const response = await fetch('/exhibitions.json');
+    exhibitionsData = await response.json();
+    
+    // Build image URLs mapping for exhibitions
+    exhibitionsData.upcoming.forEach(exhibition => {
+      exhibitionImageUrlsByHeading[`Exhibition: ${exhibition.title}`] = [exhibition.flyer, ...exhibition.images];
+    });
+    
+    exhibitionsData.past.forEach(exhibition => {
+      // For past exhibitions, only use the images array (not the flyer)
+      exhibitionImageUrlsByHeading[`Exhibition: ${exhibition.title}`] = exhibition.images;
+    });
+    
+    // Merge with existing image URLs
+    Object.assign(imageUrlsByHeading, exhibitionImageUrlsByHeading);
+    
+    renderExhibitions();
+  } catch (error) {
+    console.error('Error loading exhibition data:', error);
   }
 }
 
@@ -295,6 +324,54 @@ function renderWorkshops() {
   // If we're on the workshops page, set up image cycling
   if (document.getElementById('workshops-content').classList.contains('active')) {
     updateWorkshopImageOnScroll();
+  }
+}
+
+function renderExhibitions() {
+  if (!exhibitionsData) return;
+  
+  const upcomingContainer = document.getElementById('upcoming-exhibitions');
+  const pastContainer = document.getElementById('past-exhibitions');
+  
+  if (upcomingContainer) {
+    upcomingContainer.innerHTML = exhibitionsData.upcoming.map(exhibition => `
+      <div class="exhibition-item" data-exhibition-id="${exhibition.id}">
+        <a href="${exhibition.link || 'javascript:void(0)'}" class="exhibition-heading" data-heading="Exhibition: ${exhibition.title}" ${exhibition.link ? 'target="_blank"' : ''}>
+          <div class="exhibition-header">
+            <img src="${exhibition.flyer}" alt="${exhibition.title}" class="exhibition-flyer" />
+            <div class="exhibition-info">
+              <h3>${exhibition.title}</h3>
+              <p>${exhibition.description}</p>
+              <div class="exhibition-date">
+                <span>${exhibition.date === 'TBD' ? 'TBD' : formatDate(exhibition.date)}</span>
+                <span>${exhibition.time === 'TBD' ? '' : exhibition.time}</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    `).join('');
+  }
+  
+  if (pastContainer) {
+    pastContainer.innerHTML = exhibitionsData.past.map(exhibition => `
+      <div class="exhibition-item" data-exhibition-id="${exhibition.id}">
+        <a href="${exhibition.link || 'javascript:void(0)'}" class="exhibition-heading" data-heading="Exhibition: ${exhibition.title}" ${exhibition.link ? 'target="_blank"' : ''}>
+          <div class="exhibition-header">
+            <img src="${exhibition.flyer}" alt="${exhibition.title}" class="exhibition-flyer" />
+            <div class="exhibition-info">
+              <h3>${exhibition.title}</h3>
+              <p>${exhibition.description}</p>
+            </div>
+          </div>
+        </a>
+      </div>
+    `).join('');
+  }
+  
+  // If we're on the exhibitions page, set up image cycling
+  if (document.getElementById('exhibitions-content').classList.contains('active')) {
+    updateExhibitionImageOnScroll();
   }
 }
 
@@ -364,9 +441,64 @@ function updateWorkshopImageOnScroll() {
   }, 100);
 }
 
+// Exhibition image scroll logic
+function updateExhibitionImageOnScroll() {
+  if (!salonImage) return;
+  
+  // Remove any previous observer/interval
+  if (window.exhibitionSectionObserver) {
+    window.exhibitionSectionObserver.disconnect();
+  }
+  if (salonCycleIntervalId) {
+    clearInterval(salonCycleIntervalId);
+    salonCycleIntervalId = null;
+  }
+  
+  // Wait a bit for exhibitions to render, then set up observer
+  setTimeout(() => {
+    // Only observe past exhibitions, not upcoming ones
+    const pastExhibitionSections = document.querySelectorAll('#past-exhibitions .exhibition-heading');
+    console.log('Found past exhibition sections:', pastExhibitionSections.length);
+    
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+    
+    window.exhibitionSectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const heading = entry.target.getAttribute('data-heading');
+        const imageUrls = imageUrlsByHeading[heading];
+        console.log('Exhibition heading:', heading, 'Image URLs:', imageUrls);
+        
+        if (!imageUrls) return;
+        
+        if (entry.isIntersecting) {
+          if (salonCycleIntervalId) clearInterval(salonCycleIntervalId);
+          salonCurrentImageIndex = 0;
+          fadeToImage(imageUrls[0]);
+          
+          if (imageUrls.length > 1) {
+            salonCycleIntervalId = setInterval(() => {
+              salonCurrentImageIndex = (salonCurrentImageIndex + 1) % imageUrls.length;
+              fadeToImage(imageUrls[salonCurrentImageIndex]);
+            }, 1000);
+          }
+        }
+      });
+    }, observerOptions);
+    
+    pastExhibitionSections.forEach(section => {
+      window.exhibitionSectionObserver.observe(section);
+    });
+  }, 100);
+}
+
 // On load, show the correct section based on URL
 (function initPageFromUrl() {
   const path = window.location.pathname.replace('/', '') || 'salons';
   showSection(path);
   loadWorkshopData();
+  loadExhibitionData();
 })();
