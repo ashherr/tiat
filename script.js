@@ -258,15 +258,15 @@ function renderWorkshops() {
   if (upcomingContainer) {
     upcomingContainer.innerHTML = workshopsData.upcoming.map(workshop => `
       <div class="workshop-item" data-workshop-id="${workshop.id}">
-        <a href="javascript:void(0)" class="workshop-heading" data-heading="Workshop: ${workshop.title}">
+        <a href="${workshop.link || 'javascript:void(0)'}" class="workshop-heading" data-heading="Workshop: ${workshop.title}" ${workshop.link ? 'target="_blank"' : ''}>
           <div class="workshop-header">
             <img src="${workshop.flyer}" alt="${workshop.title}" class="workshop-flyer" />
             <div class="workshop-info">
               <h3>${workshop.title}</h3>
               <p>${workshop.description}</p>
               <div class="workshop-date">
-                <span>${formatDate(workshop.date)}</span>
-                <span>${workshop.time}</span>
+                <span>${workshop.date === 'TBD' ? 'TBD' : formatDate(workshop.date)}</span>
+                <span>${workshop.time === 'TBD' ? '' : workshop.time}</span>
               </div>
             </div>
           </div>
@@ -278,7 +278,7 @@ function renderWorkshops() {
   if (pastContainer) {
     pastContainer.innerHTML = workshopsData.past.map(workshop => `
       <div class="workshop-item" data-workshop-id="${workshop.id}">
-        <a href="javascript:void(0)" class="workshop-heading" data-heading="Workshop: ${workshop.title}">
+        <a href="${workshop.link || 'javascript:void(0)'}" class="workshop-heading" data-heading="Workshop: ${workshop.title}" ${workshop.link ? 'target="_blank"' : ''}>
           <div class="workshop-header">
             <img src="${workshop.flyer}" alt="${workshop.title}" class="workshop-flyer" />
             <div class="workshop-info">
