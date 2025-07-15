@@ -2,6 +2,18 @@
   "upcoming": [
     {
       "id": "workshop-3",
+      "title": "HTML Day 2025",
+      "description": "​In celebration of HTML day, join us in the park for a HTML Freewrite - [an event] in which people get together and write HTML documents.",
+      "date": "2025-08-02",
+      "time": "1:00 PM - 3:00 PM",
+      "link": "https://lu.ma/7sgumei1",
+      "flyer": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,background=white,quality=75,width=400,height=400/event-covers/9r/2940ac2b-fc2b-42a5-8d9b-926716f802b7.png",
+      "images": [
+        "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,background=white,quality=75,width=400,height=400/event-covers/9r/2940ac2b-fc2b-42a5-8d9b-926716f802b7.png"
+      ]
+    },
+    {
+      "id": "workshop-3",
       "title": "Your Workshop?",
       "description": "Let us know if you have a workshop you'd like to host.",
       "date": "TBD",
