@@ -130,13 +130,39 @@ function showSection(page) {
     item.classList.toggle('active', item.dataset.page === page);
   });
 
-  // Show/hide image box
+  // Clean up any existing observers and intervals
+  if (window.salonSectionObserver) {
+    window.salonSectionObserver.disconnect();
+  }
+  if (window.workshopSectionObserver) {
+    window.workshopSectionObserver.disconnect();
+  }
+  if (window.exhibitionSectionObserver) {
+    window.exhibitionSectionObserver.disconnect();
+  }
+  if (window.salonCycleIntervalId) {
+    clearInterval(window.salonCycleIntervalId);
+    window.salonCycleIntervalId = null;
+  }
+  if (window.workshopCycleIntervalId) {
+    clearInterval(window.workshopCycleIntervalId);
+    window.workshopCycleIntervalId = null;
+  }
+  if (window.exhibitionCycleIntervalId) {
+    clearInterval(window.exhibitionCycleIntervalId);
+    window.exhibitionCycleIntervalId = null;
+  }
+
+  // Show/hide image box and set up appropriate image cycling
   if (page === 'salons') {
     salonImageBox.style.display = '';
     updateSalonImageOnScroll();
   } else if (page === 'workshops') {
     salonImageBox.style.display = '';
     updateWorkshopImageOnScroll();
+  } else if (page === 'exhibitions') {
+    salonImageBox.style.display = '';
+    updateExhibitionImageOnScroll();
   } else {
     salonImageBox.style.display = 'none';
     if (salonImage) salonImage.src = '';
@@ -173,9 +199,9 @@ function updateSalonImageOnScroll() {
   if (window.salonSectionObserver) {
     window.salonSectionObserver.disconnect();
   }
-  if (salonCycleIntervalId) {
-    clearInterval(salonCycleIntervalId);
-    salonCycleIntervalId = null;
+  if (window.salonCycleIntervalId) {
+    clearInterval(window.salonCycleIntervalId);
+    window.salonCycleIntervalId = null;
   }
   
   // Set up observer with viewport as root for consistent behavior
@@ -195,21 +221,21 @@ function updateSalonImageOnScroll() {
       if (!imageUrls) return;
       if (entry.isIntersecting) {
         // Stop any existing image cycling
-        if (salonCycleIntervalId) clearInterval(salonCycleIntervalId);
+        if (window.salonCycleIntervalId) clearInterval(window.salonCycleIntervalId);
         currentSalonSection = section;
         salonCurrentImageIndex = 0;
         fadeToImage(imageUrls[0]);
         // Start cycling images
         if (imageUrls.length > 1) {
-          salonCycleIntervalId = setInterval(() => {
+          window.salonCycleIntervalId = setInterval(() => {
             salonCurrentImageIndex = (salonCurrentImageIndex + 1) % imageUrls.length;
             fadeToImage(imageUrls[salonCurrentImageIndex]);
           }, 1000);
         }
       } else if (section === currentSalonSection && !entry.isIntersecting) {
-        if (salonCycleIntervalId) {
-          clearInterval(salonCycleIntervalId);
-          salonCycleIntervalId = null;
+        if (window.salonCycleIntervalId) {
+          clearInterval(window.salonCycleIntervalId);
+          window.salonCycleIntervalId = null;
         }
         currentSalonSection = null;
       }
@@ -395,9 +421,9 @@ function updateWorkshopImageOnScroll() {
   if (window.workshopSectionObserver) {
     window.workshopSectionObserver.disconnect();
   }
-  if (salonCycleIntervalId) {
-    clearInterval(salonCycleIntervalId);
-    salonCycleIntervalId = null;
+  if (window.workshopCycleIntervalId) {
+    clearInterval(window.workshopCycleIntervalId);
+    window.workshopCycleIntervalId = null;
   }
   
   // Wait a bit for workshops to render, then set up observer
@@ -421,12 +447,12 @@ function updateWorkshopImageOnScroll() {
         if (!imageUrls) return;
         
         if (entry.isIntersecting) {
-          if (salonCycleIntervalId) clearInterval(salonCycleIntervalId);
+          if (window.workshopCycleIntervalId) clearInterval(window.workshopCycleIntervalId);
           salonCurrentImageIndex = 0;
           fadeToImage(imageUrls[0]);
           
           if (imageUrls.length > 1) {
-            salonCycleIntervalId = setInterval(() => {
+            window.workshopCycleIntervalId = setInterval(() => {
               salonCurrentImageIndex = (salonCurrentImageIndex + 1) % imageUrls.length;
               fadeToImage(imageUrls[salonCurrentImageIndex]);
             }, 1000);
@@ -449,9 +475,9 @@ function updateExhibitionImageOnScroll() {
   if (window.exhibitionSectionObserver) {
     window.exhibitionSectionObserver.disconnect();
   }
-  if (salonCycleIntervalId) {
-    clearInterval(salonCycleIntervalId);
-    salonCycleIntervalId = null;
+  if (window.exhibitionCycleIntervalId) {
+    clearInterval(window.exhibitionCycleIntervalId);
+    window.exhibitionCycleIntervalId = null;
   }
   
   // Wait a bit for exhibitions to render, then set up observer
@@ -475,12 +501,12 @@ function updateExhibitionImageOnScroll() {
         if (!imageUrls) return;
         
         if (entry.isIntersecting) {
-          if (salonCycleIntervalId) clearInterval(salonCycleIntervalId);
+          if (window.exhibitionCycleIntervalId) clearInterval(window.exhibitionCycleIntervalId);
           salonCurrentImageIndex = 0;
           fadeToImage(imageUrls[0]);
           
           if (imageUrls.length > 1) {
-            salonCycleIntervalId = setInterval(() => {
+            window.exhibitionCycleIntervalId = setInterval(() => {
               salonCurrentImageIndex = (salonCurrentImageIndex + 1) % imageUrls.length;
               fadeToImage(imageUrls[salonCurrentImageIndex]);
             }, 1000);
