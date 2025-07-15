@@ -134,6 +134,9 @@ function showSection(page) {
   if (page === 'salons') {
     salonImageBox.style.display = '';
     updateSalonImageOnScroll();
+  } else if (page === 'workshops') {
+    salonImageBox.style.display = '';
+    updateWorkshopImageOnScroll();
   } else {
     salonImageBox.style.display = 'none';
     if (salonImage) salonImage.src = '';
@@ -218,8 +221,139 @@ function updateSalonImageOnScroll() {
   });
 }
 
+// Workshop data and functionality
+let workshopsData = null;
+const workshopImageUrlsByHeading = {};
+
+// Load workshop data
+async function loadWorkshopData() {
+  try {
+    const response = await fetch('/workshops.json');
+    workshopsData = await response.json();
+    
+    // Build image URLs mapping for workshops
+    workshopsData.upcoming.forEach(workshop => {
+      workshopImageUrlsByHeading[`Workshop: ${workshop.title}`] = [workshop.flyer, ...workshop.images];
+    });
+    
+    workshopsData.past.forEach(workshop => {
+      workshopImageUrlsByHeading[`Workshop: ${workshop.title}`] = [workshop.flyer, ...workshop.images];
+    });
+    
+    // Merge with existing image URLs
+    Object.assign(imageUrlsByHeading, workshopImageUrlsByHeading);
+    
+    renderWorkshops();
+  } catch (error) {
+    console.error('Error loading workshop data:', error);
+  }
+}
+
+function renderWorkshops() {
+  if (!workshopsData) return;
+  
+  const upcomingContainer = document.getElementById('upcoming-workshops');
+  const pastContainer = document.getElementById('past-workshops');
+  
+  if (upcomingContainer) {
+    upcomingContainer.innerHTML = workshopsData.upcoming.map(workshop => `
+      <div class="workshop-item" data-workshop-id="${workshop.id}">
+        <a href="javascript:void(0)" class="workshop-heading" data-heading="Workshop: ${workshop.title}">
+          <div class="workshop-header">
+            <img src="${workshop.flyer}" alt="${workshop.title}" class="workshop-flyer" />
+            <div class="workshop-info">
+              <h3>${workshop.title}</h3>
+              <p>${workshop.description}</p>
+              <div class="workshop-date">
+                <span>${formatDate(workshop.date)}</span>
+                <span>${workshop.time}</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    `).join('');
+  }
+  
+  if (pastContainer) {
+    pastContainer.innerHTML = workshopsData.past.map(workshop => `
+      <div class="workshop-item" data-workshop-id="${workshop.id}">
+        <a href="javascript:void(0)" class="workshop-heading" data-heading="Workshop: ${workshop.title}">
+          <div class="workshop-header">
+            <img src="${workshop.flyer}" alt="${workshop.title}" class="workshop-flyer" />
+            <div class="workshop-info">
+              <h3>${workshop.title}</h3>
+              <p>${workshop.description}</p>
+            </div>
+          </div>
+        </a>
+      </div>
+    `).join('');
+  }
+}
+
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+}
+
+
+
+// Workshop image scroll logic
+function updateWorkshopImageOnScroll() {
+  if (!salonImage) return;
+  
+  // Remove any previous observer/interval
+  if (window.workshopSectionObserver) {
+    window.workshopSectionObserver.disconnect();
+  }
+  if (salonCycleIntervalId) {
+    clearInterval(salonCycleIntervalId);
+    salonCycleIntervalId = null;
+  }
+  
+  const workshopSections = document.querySelectorAll('#workshops-content .workshop-heading');
+  
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.1
+  };
+  
+  window.workshopSectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const heading = entry.target.getAttribute('data-heading');
+      const imageUrls = imageUrlsByHeading[heading];
+      if (!imageUrls) return;
+      
+      if (entry.isIntersecting) {
+        if (salonCycleIntervalId) clearInterval(salonCycleIntervalId);
+        salonCurrentImageIndex = 0;
+        fadeToImage(imageUrls[0]);
+        
+        if (imageUrls.length > 1) {
+          salonCycleIntervalId = setInterval(() => {
+            salonCurrentImageIndex = (salonCurrentImageIndex + 1) % imageUrls.length;
+            fadeToImage(imageUrls[salonCurrentImageIndex]);
+          }, 1000);
+        }
+      }
+    });
+  }, observerOptions);
+  
+  workshopSections.forEach(section => {
+    window.workshopSectionObserver.observe(section);
+  });
+}
+
 // On load, show the correct section based on URL
 (function initPageFromUrl() {
   const path = window.location.pathname.replace('/', '') || 'salons';
   showSection(path);
+  loadWorkshopData();
 })();
