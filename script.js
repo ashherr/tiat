@@ -237,7 +237,8 @@ async function loadWorkshopData() {
     });
     
     workshopsData.past.forEach(workshop => {
-      workshopImageUrlsByHeading[`Workshop: ${workshop.title}`] = [workshop.flyer, ...workshop.images];
+      // For past workshops, only use the images array (not the flyer)
+      workshopImageUrlsByHeading[`Workshop: ${workshop.title}`] = workshop.images;
     });
     
     // Merge with existing image URLs
@@ -324,8 +325,9 @@ function updateWorkshopImageOnScroll() {
   
   // Wait a bit for workshops to render, then set up observer
   setTimeout(() => {
-    const workshopSections = document.querySelectorAll('#workshops-content .workshop-heading');
-    console.log('Found workshop sections:', workshopSections.length);
+    // Only observe past workshops, not upcoming ones
+    const pastWorkshopSections = document.querySelectorAll('#past-workshops .workshop-heading');
+    console.log('Found past workshop sections:', pastWorkshopSections.length);
     
     const observerOptions = {
       root: null,
@@ -356,7 +358,7 @@ function updateWorkshopImageOnScroll() {
       });
     }, observerOptions);
     
-    workshopSections.forEach(section => {
+    pastWorkshopSections.forEach(section => {
       window.workshopSectionObserver.observe(section);
     });
   }, 100);
