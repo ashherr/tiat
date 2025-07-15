@@ -290,6 +290,11 @@ function renderWorkshops() {
       </div>
     `).join('');
   }
+  
+  // If we're on the workshops page, set up image cycling
+  if (document.getElementById('workshops-content').classList.contains('active')) {
+    updateWorkshopImageOnScroll();
+  }
 }
 
 function formatDate(dateString) {
@@ -317,38 +322,44 @@ function updateWorkshopImageOnScroll() {
     salonCycleIntervalId = null;
   }
   
-  const workshopSections = document.querySelectorAll('#workshops-content .workshop-heading');
-  
-  const observerOptions = {
-    root: null,
-    rootMargin: '0px',
-    threshold: 0.1
-  };
-  
-  window.workshopSectionObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      const heading = entry.target.getAttribute('data-heading');
-      const imageUrls = imageUrlsByHeading[heading];
-      if (!imageUrls) return;
-      
-      if (entry.isIntersecting) {
-        if (salonCycleIntervalId) clearInterval(salonCycleIntervalId);
-        salonCurrentImageIndex = 0;
-        fadeToImage(imageUrls[0]);
+  // Wait a bit for workshops to render, then set up observer
+  setTimeout(() => {
+    const workshopSections = document.querySelectorAll('#workshops-content .workshop-heading');
+    console.log('Found workshop sections:', workshopSections.length);
+    
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+    
+    window.workshopSectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const heading = entry.target.getAttribute('data-heading');
+        const imageUrls = imageUrlsByHeading[heading];
+        console.log('Workshop heading:', heading, 'Image URLs:', imageUrls);
         
-        if (imageUrls.length > 1) {
-          salonCycleIntervalId = setInterval(() => {
-            salonCurrentImageIndex = (salonCurrentImageIndex + 1) % imageUrls.length;
-            fadeToImage(imageUrls[salonCurrentImageIndex]);
-          }, 1000);
+        if (!imageUrls) return;
+        
+        if (entry.isIntersecting) {
+          if (salonCycleIntervalId) clearInterval(salonCycleIntervalId);
+          salonCurrentImageIndex = 0;
+          fadeToImage(imageUrls[0]);
+          
+          if (imageUrls.length > 1) {
+            salonCycleIntervalId = setInterval(() => {
+              salonCurrentImageIndex = (salonCurrentImageIndex + 1) % imageUrls.length;
+              fadeToImage(imageUrls[salonCurrentImageIndex]);
+            }, 1000);
+          }
         }
-      }
+      });
+    }, observerOptions);
+    
+    workshopSections.forEach(section => {
+      window.workshopSectionObserver.observe(section);
     });
-  }, observerOptions);
-  
-  workshopSections.forEach(section => {
-    window.workshopSectionObserver.observe(section);
-  });
+  }, 100);
 }
 
 // On load, show the correct section based on URL
