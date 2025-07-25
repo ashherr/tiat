@@ -283,14 +283,32 @@ h1, h2, p, td {
     padding: 0;
     margin: 0;
 }
-.sidebar ul {
-    display: flex;
-    flex-direction: row;
-    width: auto;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
+    .sidebar ul {
+        display: flex;
+        flex-direction: row;
+        width: auto;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        /* Add marquee-like movement on mobile */
+        animation: marquee-scroll 8s linear infinite;
+    }
+    
+    /* Marquee animation for mobile sidebar */
+    @keyframes marquee-scroll {
+        0% {
+            transform: translateX(0);
+        }
+        25% {
+            transform: translateX(-10px);
+        }
+        75% {
+            transform: translateX(10px);
+        }
+        100% {
+            transform: translateX(0);
+        }
+    }
 .nav-item {
     display: inline-flex;
     align-items: center;
@@ -303,6 +321,8 @@ h1, h2, p, td {
     box-shadow: none;
     white-space: nowrap;
     cursor: pointer;
+    position: relative;
+    z-index: 2;
 }
 .nav-item span {
     transition: background 0.2s, color 0.2s;
@@ -442,9 +462,59 @@ h1, h2, p, td {
         overflow-y: hidden;
         scrollbar-width: none;
         -ms-overflow-style: none;
+        /* Add subtle animation to indicate scrollable content */
+        animation: subtle-bounce 3s ease-in-out infinite;
     }
     .sidebar::-webkit-scrollbar {
         display: none;
+    }
+    
+    /* Add a subtle bounce animation to indicate scrollable content */
+    @keyframes subtle-bounce {
+        0%, 100% {
+            transform: translateX(0);
+        }
+        50% {
+            transform: translateX(2px);
+        }
+    }
+    
+    /* Add a visual indicator for scrollable content */
+    .sidebar::after {
+        content: '';
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-left: 6px solid #222;
+        border-top: 4px solid transparent;
+        border-bottom: 4px solid transparent;
+        opacity: 0.6;
+        animation: pulse-arrow 2s ease-in-out infinite;
+    }
+    
+    /* Add gradient fade on right edge to indicate more content */
+    .sidebar::before {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 30px;
+        height: 100%;
+        background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8));
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    @keyframes pulse-arrow {
+        0%, 100% {
+            opacity: 0.3;
+        }
+        50% {
+            opacity: 0.8;
+        }
     }
     .site-content {
         padding-top: 550px !important;
