@@ -13,13 +13,13 @@
       ]
     },
     {
-      "id": "workshop-3",
-      "title": "Your Workshop?",
-      "description": "Let us know if you have a workshop you'd like to host.",
+      "id": "workshop-4",
+      "title": "Digital Poetics",
+      "description": "Explore the poetics and tensions within generative systems. A space for nuance for incubating alternate imaginaries of intelligence.",
       "date": "TBD",
       "time": "TBD",
       "link": "mailto:imempowa@gmail.com?subject=TIAT%20Workshop",
-      "flyer": "https://i.postimg.cc/gc63D9gt/tiat-blank.png",
+      "flyer": "https://i.postimg.cc/d1D1vHKR/web-On-the-seabed-gazing-up.webp",
       "images": [
         "https://i.postimg.cc/gc63D9gt/tiat-blank.png"
       ]
@@ -28,7 +28,7 @@
   "past": [
     {
       "id": "workshop-1",
-      "title": "Digital Poetics #1",
+      "title": "DPMG #1",
       "description": "​a casual and collaborative evening of creativity, experimentation, and sharing! Whether you're into coding, design, writing, or just love exploring digital art, this is a space to play, build, and connect with like-minded folks.",
       "date": "2024-03-11",
       "link": "https://lu.ma/a3ur905j",
@@ -39,7 +39,7 @@
     },
     {
       "id": "workshop-2",
-      "title": "Digital Poetics #2",
+      "title": "DPMG #2",
       "description": "​a casual and collaborative evening of creativity, experimentation, and sharing! Whether you're into coding, design, writing, or just love exploring digital art, this is a space to play, build, and connect with like-minded folks.",
       "date": "2024-04-16",
       "link": "https://lu.ma/n5c5mnwf",
