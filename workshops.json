@@ -1,18 +1,6 @@
 {
   "upcoming": [
     {
-      "id": "workshop-3",
-      "title": "HTML Day 2025",
-      "description": "​In celebration of HTML day, join us in the park for a HTML Freewrite - [an event] in which people get together and write HTML documents.",
-      "date": "2025-08-02",
-      "time": "1:00 PM - 3:00 PM",
-      "link": "https://lu.ma/7sgumei1",
-      "flyer": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,background=white,quality=75,width=400,height=400/event-covers/9r/2940ac2b-fc2b-42a5-8d9b-926716f802b7.png",
-      "images": [
-        "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,background=white,quality=75,width=400,height=400/event-covers/9r/2940ac2b-fc2b-42a5-8d9b-926716f802b7.png"
-      ]
-    },
-    {
       "id": "workshop-4",
       "title": "Digital Poetics",
       "description": "Explore the poetics and tensions within generative systems. A space for nuance for incubating alternate imaginaries of intelligence.",
@@ -46,6 +34,17 @@
       "flyer": "https://i.postimg.cc/DZXvH3pB/92e083b1-f38a-4949-9653-8d1fc65e3c6d-ezgif-com-video-to-gif-converter.gif",
       "images": [
         "https://i.postimg.cc/GhKwgf2G/IMG-4710.jpg"
+      ]
+    },{
+      "id": "workshop-3",
+      "title": "HTML Day 2025",
+      "description": "​In celebration of HTML day, join us in the park for a HTML Freewrite - [an event] in which people get together and write HTML documents.",
+      "date": "2025-08-02",
+      "time": "1:00 PM - 3:00 PM",
+      "link": "https://lu.ma/7sgumei1",
+      "flyer": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,background=white,quality=75,width=400,height=400/event-covers/9r/2940ac2b-fc2b-42a5-8d9b-926716f802b7.png",
+      "images": [
+        "https://i.postimg.cc/5N5VG4gs/htlday.png"
       ]
     }
   ]
