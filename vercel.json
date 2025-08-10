@@ -5,6 +5,7 @@
     { "source": "/grants", "destination": "/index.html" },
     { "source": "/exhibitions", "destination": "/index.html" },
     { "source": "/workshops", "destination": "/index.html" },
-    { "source": "/space", "destination": "/index.html" }
+    { "source": "/space", "destination": "/index.html" },
+    { "source": "/links", "destination": "/links.html" }
   ]
 } 
